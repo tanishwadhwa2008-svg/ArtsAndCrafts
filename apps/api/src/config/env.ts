@@ -37,6 +37,17 @@ const envSchema = z.object({
   // Logging
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
 
+  // Authentication (self-managed JWT). Secrets must be long & random —
+  // generate with `openssl rand -base64 48`.
+  JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
+  JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET must be at least 32 characters'),
+  // Access-token lifetime, expressed as a `jose`-compatible duration.
+  JWT_ACCESS_TTL: z.string().default('15m'),
+  // Refresh-token lifetime in days (used for cookie maxAge and DB expiry).
+  JWT_REFRESH_TTL_DAYS: z.coerce.number().int().positive().default(7),
+  // Optional cookie domain (leave unset for host-only cookies in local dev).
+  COOKIE_DOMAIN: z.string().optional(),
+
   // Trust the first proxy hop (needed for correct client IPs / rate limiting
   // behind a reverse proxy). Disabled by default for local development.
   TRUST_PROXY: z

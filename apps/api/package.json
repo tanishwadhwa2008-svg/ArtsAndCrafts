@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@arts/shared": "workspace:*",
+    "@node-rs/argon2": "^2.0.2",
     "@prisma/client": "^6.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -31,6 +32,7 @@
     "express-rate-limit": "^7.4.1",
     "helmet": "^8.0.0",
     "hpp": "^0.2.3",
+    "jose": "^5.9.6",
     "pino": "^9.5.0",
     "pino-http": "^10.3.0",
     "zod": "^3.23.8"

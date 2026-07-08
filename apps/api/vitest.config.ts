@@ -8,6 +8,10 @@ export default defineConfig({
     env: {
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
+      JWT_ACCESS_SECRET: 'test_access_secret_0123456789abcdefghijklmnop',
+      JWT_REFRESH_SECRET: 'test_refresh_secret_0123456789abcdefghijklmnop',
+      JWT_ACCESS_TTL: '15m',
+      JWT_REFRESH_TTL_DAYS: '7',
     },
   },
 });
