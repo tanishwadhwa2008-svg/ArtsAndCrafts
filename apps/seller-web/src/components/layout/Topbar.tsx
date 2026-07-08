@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { LogOut, UserRound } from 'lucide-react';
+import { LogOut, Menu, UserRound } from 'lucide-react';
 import { useAuth } from '../../auth/AuthProvider.js';
 import { Button } from '../ui/button.js';
 
-export function Topbar() {
+export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { user, logout } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -17,11 +17,22 @@ export function Topbar() {
   };
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-line bg-surface/40 px-6 backdrop-blur">
-      <p className="font-serif text-sm italic text-muted">
-        Welcome back,{' '}
-        <span className="text-gold-300">{user?.displayName ?? user?.email ?? 'artisan'}</span>
-      </p>
+    <header className="flex h-16 items-center justify-between border-b border-line bg-surface/40 px-4 backdrop-blur sm:px-6">
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden"
+          onClick={onMenuClick}
+          aria-label="Open menu"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+        <p className="font-serif text-sm italic text-muted">
+          Welcome back,{' '}
+          <span className="text-gold-300">{user?.displayName ?? user?.email ?? 'artisan'}</span>
+        </p>
+      </div>
 
       <div className="flex items-center gap-3">
         <span className="hidden items-center gap-2 rounded-full border border-line px-3 py-1.5 text-xs text-muted sm:flex">
