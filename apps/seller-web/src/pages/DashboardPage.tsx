@@ -1,8 +1,9 @@
-import { AlertTriangle, Boxes, FolderTree, Package } from 'lucide-react';
+import { AlertTriangle, Boxes, FolderTree, Layers, Package, Wallet } from 'lucide-react';
 import { PageHeader } from '../components/ui/page-header.js';
-import { Card, CardContent } from '../components/ui/card.js';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card.js';
 import { Spinner } from '../components/ui/spinner.js';
-import { useCategories, useInventory, useProducts } from '../hooks/queries.js';
+import { BarChart } from '../components/ui/bar-chart.js';
+import { useAnalyticsSummary } from '../hooks/queries.js';
 
 function StatCard({
   label,
@@ -40,54 +41,113 @@ function StatCard({
   );
 }
 
+const STATUS_LABEL: Record<'ACTIVE' | 'DRAFT' | 'ARCHIVED', string> = {
+  ACTIVE: 'Active',
+  DRAFT: 'Draft',
+  ARCHIVED: 'Archived',
+};
+
 export function DashboardPage() {
-  const products = useProducts({ page: 1, pageSize: 1 });
-  const categories = useCategories();
-  const inventory = useInventory({ page: 1, pageSize: 1 });
-  const lowStock = useInventory({ page: 1, pageSize: 1, lowStockOnly: true });
+  const { data, isLoading, isError } = useAnalyticsSummary();
+
+  const statusData = data
+    ? (['ACTIVE', 'DRAFT', 'ARCHIVED'] as const).map((key) => ({
+        label: STATUS_LABEL[key],
+        value: data.products.byStatus[key],
+      }))
+    : [];
+
+  const categoryData = (data?.productsByCategory ?? []).slice(0, 8).map((c) => ({
+    label: c.name,
+    value: c.productCount,
+    hint: `${c.productCount} product${c.productCount === 1 ? '' : 's'}`,
+  }));
+
+  const inventoryValue = data?.inventory.valueByCurrency.length
+    ? data.inventory.valueByCurrency.map((v) => `${v.currency} ${v.value}`).join(' · ')
+    : '—';
 
   return (
     <div>
       <PageHeader eyebrow="Overview" title="Dashboard" />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          label="Products"
-          value={products.data?.meta.total ?? 0}
-          icon={Package}
-          loading={products.isLoading}
-        />
-        <StatCard
-          label="Categories"
-          value={categories.data?.length ?? 0}
-          icon={FolderTree}
-          loading={categories.isLoading}
-        />
-        <StatCard
-          label="Tracked Variants"
-          value={inventory.data?.meta.total ?? 0}
-          icon={Boxes}
-          loading={inventory.isLoading}
-        />
-        <StatCard
-          label="Low Stock"
-          value={lowStock.data?.meta.total ?? 0}
-          icon={AlertTriangle}
-          loading={lowStock.isLoading}
-          accent
-        />
-      </div>
+      {isError ? (
+        <p className="py-16 text-center text-danger">Failed to load analytics.</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <StatCard
+              label="Products"
+              value={data?.products.total ?? 0}
+              icon={Package}
+              loading={isLoading}
+            />
+            <StatCard
+              label="Categories"
+              value={data?.categories.total ?? 0}
+              icon={FolderTree}
+              loading={isLoading}
+            />
+            <StatCard
+              label="Tracked Variants"
+              value={data?.variants.total ?? 0}
+              icon={Boxes}
+              loading={isLoading}
+            />
+            <StatCard
+              label="Units On Hand"
+              value={data?.inventory.totalUnits ?? 0}
+              icon={Layers}
+              loading={isLoading}
+            />
+            <StatCard
+              label="Inventory Value"
+              value={inventoryValue}
+              icon={Wallet}
+              loading={isLoading}
+            />
+            <StatCard
+              label="Low Stock"
+              value={data?.inventory.lowStockCount ?? 0}
+              icon={AlertTriangle}
+              loading={isLoading}
+              accent
+            />
+          </div>
 
-      <Card className="mt-8">
-        <CardContent className="pt-6">
-          <p className="eyebrow mb-2">Our Legacy</p>
-          <h2 className="text-xl text-gold-300">Preserving ancient craftsmanship</h2>
-          <p className="mt-3 max-w-2xl font-serif text-[15px] leading-relaxed text-muted">
-            Manage your catalog, variants, imagery and stock from a single, refined workspace. Every
-            product you curate carries the story of a master artisan.
-          </p>
-        </CardContent>
-      </Card>
+          <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Products by status</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex items-center gap-2 py-6 text-muted">
+                    <Spinner className="text-gold-500" /> Loading…
+                  </div>
+                ) : (
+                  <BarChart data={statusData} emptyLabel="No products yet." />
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Products by category</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex items-center gap-2 py-6 text-muted">
+                    <Spinner className="text-gold-500" /> Loading…
+                  </div>
+                ) : (
+                  <BarChart data={categoryData} emptyLabel="No categorized products yet." />
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 }

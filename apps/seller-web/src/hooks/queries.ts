@@ -6,6 +6,7 @@ import {
   listProducts,
   type ProductListParams,
 } from '../api/catalog.js';
+import { getAnalyticsSummary } from '../api/analytics.js';
 
 export function useProducts(params: ProductListParams) {
   return useQuery({
@@ -30,5 +31,12 @@ export function useInventory(params: { page?: number; pageSize?: number; lowStoc
   return useQuery({
     queryKey: ['inventory', params],
     queryFn: () => listInventory(params),
+  });
+}
+
+export function useAnalyticsSummary() {
+  return useQuery({
+    queryKey: ['analytics', 'summary'],
+    queryFn: getAnalyticsSummary,
   });
 }

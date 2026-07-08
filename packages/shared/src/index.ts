@@ -13,3 +13,4 @@ export * from './schemas/common.js';
 export * from './schemas/catalog.js';
 export * from './schemas/inventory.js';
 export * from './schemas/media.js';
+export * from './schemas/analytics.js';

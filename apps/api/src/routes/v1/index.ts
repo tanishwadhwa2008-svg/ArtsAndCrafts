@@ -5,6 +5,7 @@ import { categoriesRouter } from '../../modules/catalog/categories/categories.ro
 import { productsRouter } from '../../modules/catalog/products/products.routes.js';
 import { inventoryRouter } from '../../modules/inventory/inventory.routes.js';
 import { mediaRouter } from '../../modules/media/media.routes.js';
+import { analyticsRouter } from '../../modules/analytics/analytics.routes.js';
 
 /**
  * Version 1 API router.
@@ -28,3 +29,4 @@ v1Router.use('/categories', categoriesRouter);
 v1Router.use('/products', productsRouter);
 v1Router.use('/inventory', inventoryRouter);
 v1Router.use('/media', mediaRouter);
+v1Router.use('/analytics', analyticsRouter);
