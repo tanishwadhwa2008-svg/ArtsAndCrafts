@@ -1,0 +1,7 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Allow only trusted dependency build scripts to run.
+onlyBuiltDependencies:
+  - esbuild

@@ -1,0 +1,31 @@
+{
+  "name": "@arts/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Arts & Handicrafts seller-portal API (Express + TypeScript).",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf dist .turbo"
+  },
+  "dependencies": {
+    "@arts/shared": "workspace:*",
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "@arts/config": "workspace:*",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.8.1",
+    "eslint": "^9.13.0",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  }
+}
