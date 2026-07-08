@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import type { Product } from '../api/catalog.js';
 import { useProducts } from '../hooks/queries.js';
+import { useDeleteProduct } from '../hooks/mutations.js';
 import { PageHeader } from '../components/ui/page-header.js';
 import { Button } from '../components/ui/button.js';
 import { Input } from '../components/ui/input.js';
@@ -21,6 +23,7 @@ export function ProductsPage() {
   const [page, setPage] = useState(1);
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
+  const deleteMut = useDeleteProduct();
 
   const { data, isLoading, isError } = useProducts({
     page,
@@ -34,6 +37,12 @@ export function ProductsPage() {
     setSearch(searchInput.trim());
   };
 
+  const remove = (product: Product) => {
+    if (window.confirm(`Delete product "${product.title}"?`)) {
+      deleteMut.mutate(product.id);
+    }
+  };
+
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? 1;
 
@@ -42,7 +51,14 @@ export function ProductsPage() {
       <PageHeader
         eyebrow="Catalog"
         title="Products"
-        actions={<Button disabled>New product</Button>}
+        actions={
+          <Button asChild>
+            <Link to="/products/new">
+              <Plus className="h-4 w-4" />
+              New product
+            </Link>
+          </Button>
+        }
       />
 
       <form onSubmit={submitSearch} className="mb-4 flex max-w-sm items-center gap-2">
@@ -78,12 +94,17 @@ export function ProductsPage() {
                 <TH>Base price</TH>
                 <TH>Variants</TH>
                 <TH>Updated</TH>
+                <TH className="text-right">Actions</TH>
               </TR>
             </THead>
             <TBody>
               {data.items.map((p) => (
                 <TR key={p.id}>
-                  <TD className="font-medium text-fg">{p.title}</TD>
+                  <TD className="font-medium text-fg">
+                    <Link to={`/products/${p.id}/edit`} className="hover:text-gold-300">
+                      {p.title}
+                    </Link>
+                  </TD>
                   <TD>
                     <Badge variant={statusVariant(p.status)}>{p.status}</Badge>
                   </TD>
@@ -94,6 +115,24 @@ export function ProductsPage() {
                   </TD>
                   <TD>{p.variants.length}</TD>
                   <TD className="text-muted">{new Date(p.updatedAt).toLocaleDateString()}</TD>
+                  <TD>
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" asChild aria-label="Edit">
+                        <Link to={`/products/${p.id}/edit`}>
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => remove(p)}
+                        aria-label="Delete"
+                        className="text-danger/80 hover:text-danger"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TD>
                 </TR>
               ))}
             </TBody>

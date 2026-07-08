@@ -1,17 +1,20 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
+import type { InventoryItem } from '../api/catalog.js';
 import { useInventory } from '../hooks/queries.js';
 import { PageHeader } from '../components/ui/page-header.js';
 import { Button } from '../components/ui/button.js';
 import { Badge } from '../components/ui/badge.js';
 import { Spinner } from '../components/ui/spinner.js';
 import { Table, TBody, TD, TH, THead, TR } from '../components/ui/table.js';
+import { InventoryAdjustDialog } from './inventory/InventoryAdjustDialog.js';
 
 const PAGE_SIZE = 10;
 
 export function InventoryPage() {
   const [page, setPage] = useState(1);
   const [lowStockOnly, setLowStockOnly] = useState(false);
+  const [adjusting, setAdjusting] = useState<InventoryItem | null>(null);
   const { data, isLoading, isError } = useInventory({ page, pageSize: PAGE_SIZE, lowStockOnly });
 
   const totalPages = data?.meta.totalPages ?? 1;
@@ -54,6 +57,7 @@ export function InventoryPage() {
                 <TH>Available</TH>
                 <TH>Threshold</TH>
                 <TH>Status</TH>
+                <TH className="text-right">Actions</TH>
               </TR>
             </THead>
             <TBody>
@@ -73,6 +77,19 @@ export function InventoryPage() {
                     ) : (
                       <Badge variant="success">OK</Badge>
                     )}
+                  </TD>
+                  <TD>
+                    <div className="flex justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setAdjusting(i)}
+                        aria-label="Adjust stock"
+                      >
+                        <SlidersHorizontal className="h-4 w-4" />
+                        Adjust
+                      </Button>
+                    </div>
                   </TD>
                 </TR>
               ))}
@@ -102,6 +119,14 @@ export function InventoryPage() {
           </div>
         </>
       )}
+
+      <InventoryAdjustDialog
+        item={adjusting}
+        open={adjusting !== null}
+        onOpenChange={(open) => {
+          if (!open) setAdjusting(null);
+        }}
+      />
     </div>
   );
 }

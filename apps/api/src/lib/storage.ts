@@ -17,6 +17,9 @@ export function getS3Client(): S3Client {
     endpoint: env.S3_ENDPOINT,
     region: env.S3_REGION,
     forcePathStyle: env.S3_FORCE_PATH_STYLE,
+    // Do not add flexible-checksum (CRC32) params to presigned URLs; browser
+    // PUT uploads cannot satisfy them and the request is aborted otherwise.
+    requestChecksumCalculation: 'WHEN_REQUIRED',
     credentials: {
       accessKeyId: env.S3_ACCESS_KEY!,
       secretAccessKey: env.S3_SECRET_KEY!,

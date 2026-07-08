@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import {
+  getProduct,
   listCategories,
   listInventory,
   listProducts,
@@ -10,6 +11,14 @@ export function useProducts(params: ProductListParams) {
   return useQuery({
     queryKey: ['products', params],
     queryFn: () => listProducts(params),
+  });
+}
+
+export function useProduct(id: string | undefined) {
+  return useQuery({
+    queryKey: ['product', id],
+    queryFn: () => getProduct(id!),
+    enabled: Boolean(id),
   });
 }
 

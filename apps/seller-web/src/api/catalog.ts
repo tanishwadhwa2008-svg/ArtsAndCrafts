@@ -1,4 +1,15 @@
-import type { Paginated } from '@arts/shared';
+import type {
+  AdjustInventoryInput,
+  AttachImageInput,
+  CreateCategoryInput,
+  CreateProductInput,
+  CreateVariantInput,
+  Paginated,
+  UpdateCategoryInput,
+  UpdateProductInput,
+  UpdateVariantInput,
+  UploadUrlInput,
+} from '@arts/shared';
 import { apiRequest } from '../lib/api.js';
 
 export interface Category {
@@ -109,4 +120,101 @@ export function listInventory(params: {
   return apiRequest<Paginated<InventoryItem>>(
     `/inventory${query({ page: params.page, pageSize: params.pageSize, lowStockOnly: params.lowStockOnly ? 'true' : undefined })}`,
   );
+}
+
+// --- Products ---
+
+export function getProduct(id: string): Promise<Product> {
+  return apiRequest<Product>(`/products/${id}`);
+}
+
+export function createProduct(body: CreateProductInput): Promise<Product> {
+  return apiRequest<Product>('/products', { method: 'POST', body });
+}
+
+export function updateProduct(id: string, body: UpdateProductInput): Promise<Product> {
+  return apiRequest<Product>(`/products/${id}`, { method: 'PATCH', body });
+}
+
+export function deleteProduct(id: string): Promise<void> {
+  return apiRequest<void>(`/products/${id}`, { method: 'DELETE' });
+}
+
+// --- Variants ---
+
+export function addVariant(productId: string, body: CreateVariantInput): Promise<Variant> {
+  return apiRequest<Variant>(`/products/${productId}/variants`, { method: 'POST', body });
+}
+
+export function updateVariant(variantId: string, body: UpdateVariantInput): Promise<Variant> {
+  return apiRequest<Variant>(`/products/variants/${variantId}`, { method: 'PATCH', body });
+}
+
+export function deleteVariant(variantId: string): Promise<void> {
+  return apiRequest<void>(`/products/variants/${variantId}`, { method: 'DELETE' });
+}
+
+// --- Images ---
+
+export function addImage(productId: string, body: AttachImageInput): Promise<ProductImage> {
+  return apiRequest<ProductImage>(`/products/${productId}/images`, { method: 'POST', body });
+}
+
+export function setPrimaryImage(imageId: string): Promise<ProductImage> {
+  return apiRequest<ProductImage>(`/products/images/${imageId}`, {
+    method: 'PATCH',
+    body: { isPrimary: true },
+  });
+}
+
+export function deleteImage(imageId: string): Promise<void> {
+  return apiRequest<void>(`/products/images/${imageId}`, { method: 'DELETE' });
+}
+
+// --- Categories ---
+
+export function createCategory(body: CreateCategoryInput): Promise<Category> {
+  return apiRequest<Category>('/categories', { method: 'POST', body });
+}
+
+export function updateCategory(id: string, body: UpdateCategoryInput): Promise<Category> {
+  return apiRequest<Category>(`/categories/${id}`, { method: 'PATCH', body });
+}
+
+export function deleteCategory(id: string): Promise<void> {
+  return apiRequest<void>(`/categories/${id}`, { method: 'DELETE' });
+}
+
+// --- Inventory ---
+
+export function adjustInventory(
+  variantId: string,
+  body: AdjustInventoryInput,
+): Promise<InventoryItem> {
+  return apiRequest<InventoryItem>(`/inventory/${variantId}`, { method: 'PATCH', body });
+}
+
+// --- Media ---
+
+export interface UploadTarget {
+  uploadUrl: string;
+  storageKey: string;
+  publicUrl: string;
+  expiresIn: number;
+}
+
+export function requestUploadUrl(body: UploadUrlInput): Promise<UploadTarget> {
+  return apiRequest<UploadTarget>('/media/upload-url', { method: 'POST', body });
+}
+
+/** Uploads the raw file bytes directly to object storage via the presigned URL. */
+export async function uploadToStorage(uploadUrl: string, file: File): Promise<void> {
+  const res = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type },
+    body: file,
+  });
+  if (!res.ok) {
+    throw new Error('File upload failed');
+  }
 }

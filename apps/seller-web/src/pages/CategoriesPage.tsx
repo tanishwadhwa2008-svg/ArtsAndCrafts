@@ -1,18 +1,45 @@
+import { useState } from 'react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
+import type { Category } from '../api/catalog.js';
 import { useCategories } from '../hooks/queries.js';
+import { useDeleteCategory } from '../hooks/mutations.js';
 import { PageHeader } from '../components/ui/page-header.js';
 import { Button } from '../components/ui/button.js';
 import { Spinner } from '../components/ui/spinner.js';
 import { Table, TBody, TD, TH, THead, TR } from '../components/ui/table.js';
+import { CategoryFormDialog } from './categories/CategoryFormDialog.js';
 
 export function CategoriesPage() {
   const { data, isLoading, isError } = useCategories();
+  const deleteMut = useDeleteCategory();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<Category | null>(null);
+
+  const openNew = () => {
+    setEditing(null);
+    setDialogOpen(true);
+  };
+  const openEdit = (category: Category) => {
+    setEditing(category);
+    setDialogOpen(true);
+  };
+  const remove = (category: Category) => {
+    if (window.confirm(`Delete category "${category.name}"?`)) {
+      deleteMut.mutate(category.id);
+    }
+  };
 
   return (
     <div>
       <PageHeader
         eyebrow="Catalog"
         title="Categories"
-        actions={<Button disabled>New category</Button>}
+        actions={
+          <Button onClick={openNew}>
+            <Plus className="h-4 w-4" />
+            New category
+          </Button>
+        }
       />
 
       {isLoading ? (
@@ -30,6 +57,7 @@ export function CategoriesPage() {
               <TH>Name</TH>
               <TH>Slug</TH>
               <TH>Position</TH>
+              <TH className="text-right">Actions</TH>
             </TR>
           </THead>
           <TBody>
@@ -38,11 +66,34 @@ export function CategoriesPage() {
                 <TD className="font-medium text-fg">{c.name}</TD>
                 <TD className="text-muted">{c.slug}</TD>
                 <TD>{c.position}</TD>
+                <TD>
+                  <div className="flex justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openEdit(c)}
+                      aria-label="Edit"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => remove(c)}
+                      aria-label="Delete"
+                      className="text-danger/80 hover:text-danger"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TD>
               </TR>
             ))}
           </TBody>
         </Table>
       )}
+
+      <CategoryFormDialog open={dialogOpen} onOpenChange={setDialogOpen} category={editing} />
     </div>
   );
 }
