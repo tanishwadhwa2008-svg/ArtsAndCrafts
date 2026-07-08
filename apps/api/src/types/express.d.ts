@@ -1,0 +1,29 @@
+import type { Request } from 'express';
+
+/**
+ * Request augmentations contributed by the API's own middleware.
+ *
+ * `validated` holds the output of the Zod validation middleware. Feature
+ * routes read strongly-typed data from here rather than trusting raw input
+ * (OWASP A03 — validate at the boundary).
+ */
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Express {
+    interface Request {
+      validated: {
+        body?: unknown;
+        query?: unknown;
+        params?: unknown;
+      };
+    }
+  }
+}
+
+export type ValidatedRequest<TBody = unknown, TQuery = unknown, TParams = unknown> = Request & {
+  validated: {
+    body: TBody;
+    query: TQuery;
+    params: TParams;
+  };
+};
