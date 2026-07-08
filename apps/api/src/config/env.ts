@@ -58,6 +58,50 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
+/**
+ * Extra validation that only applies in production, kept as a pure function so
+ * it is unit-testable. Guards against two common, dangerous deploy mistakes:
+ *
+ * 1. Shipping with development/default/weak JWT secrets.
+ * 2. Leaving CORS open to localhost, `*`, or insecure (http) origins.
+ */
+export function collectProductionIssues(config: Env, rawCorsOrigins: string | undefined): string[] {
+  const issues: string[] = [];
+
+  const looksWeak = (secret: string): boolean =>
+    secret.length < 48 ||
+    /change[_-]?me|replace[_-]?with|dev[_-]|example|secret123|password/i.test(secret);
+
+  if (looksWeak(config.JWT_ACCESS_SECRET)) {
+    issues.push(
+      'JWT_ACCESS_SECRET looks like a weak/default secret (use `openssl rand -base64 48`)',
+    );
+  }
+  if (looksWeak(config.JWT_REFRESH_SECRET)) {
+    issues.push(
+      'JWT_REFRESH_SECRET looks like a weak/default secret (use `openssl rand -base64 48`)',
+    );
+  }
+  if (config.JWT_ACCESS_SECRET === config.JWT_REFRESH_SECRET) {
+    issues.push('JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be different');
+  }
+
+  if (!rawCorsOrigins || rawCorsOrigins.trim() === '') {
+    issues.push('CORS_ORIGINS must be set explicitly in production');
+  }
+  for (const origin of config.CORS_ORIGINS) {
+    if (origin === '*') {
+      issues.push('CORS_ORIGINS may not be "*" in production');
+    } else if (/localhost|127\.0\.0\.1/.test(origin)) {
+      issues.push(`CORS origin "${origin}" (localhost) is not allowed in production`);
+    } else if (origin.startsWith('http://')) {
+      issues.push(`CORS origin "${origin}" must use https in production`);
+    }
+  }
+
+  return issues;
+}
+
 function loadEnv(): Env {
   // In non-production, populate process.env from a local `.env` file if one
   // exists. Production supplies real environment variables, so a missing file
@@ -79,6 +123,16 @@ function loadEnv(): Env {
     // Use console here intentionally: the logger may itself depend on config.
     console.error(`Invalid environment configuration:\n${details}`);
     process.exit(1);
+  }
+
+  // Stricter production-only guards (weak secrets, unsafe CORS).
+  if (parsed.data.NODE_ENV === 'production') {
+    const issues = collectProductionIssues(parsed.data, process.env.CORS_ORIGINS);
+    if (issues.length > 0) {
+      const details = issues.map((issue) => `  - ${issue}`).join('\n');
+      console.error(`Insecure production configuration:\n${details}`);
+      process.exit(1);
+    }
   }
 
   return parsed.data;

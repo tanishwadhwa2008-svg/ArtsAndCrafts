@@ -5,6 +5,18 @@ import { prisma } from './db/prisma.js';
 
 const app = createApp();
 
+// Last-resort process-level safety nets. An unhandled rejection is logged;
+// an uncaught exception leaves the process in an unknown state, so we log and
+// exit to let the orchestrator restart a clean instance.
+process.on('unhandledRejection', (reason) => {
+  logger.error({ err: reason }, 'Unhandled promise rejection');
+});
+
+process.on('uncaughtException', (error) => {
+  logger.fatal({ err: error }, 'Uncaught exception — exiting');
+  process.exit(1);
+});
+
 const server = app.listen(env.API_PORT, env.API_HOST, () => {
   logger.info(`API listening on http://${env.API_HOST}:${env.API_PORT}`);
 });

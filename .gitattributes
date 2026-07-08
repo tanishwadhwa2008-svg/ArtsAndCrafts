@@ -1,0 +1,15 @@
+# Normalize line endings: treat all text files as LF in the repository.
+* text=auto eol=lf
+
+# Explicitly binary (never normalize/diff as text).
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Lockfiles: keep LF, collapse diffs in reviews.
+pnpm-lock.yaml -diff linguist-generated
