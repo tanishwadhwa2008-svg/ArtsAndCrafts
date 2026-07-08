@@ -1,13 +1,17 @@
 import { PrismaClient, ProductStatus } from '@prisma/client';
+import { hashPassword } from '../src/lib/password.js';
 
 /**
  * Idempotent development seed.
  *
  * Uses upserts so it can be run repeatedly without duplicating data or
- * destroying existing records. Passwords are intentionally NOT set here —
- * credential hashing is introduced in Phase 3 (auth).
+ * destroying existing records. The seed seller has a known DEV-ONLY password
+ * so the portal can be logged into locally.
  */
 const prisma = new PrismaClient();
+
+const SEED_SELLER_EMAIL = 'seller@artisan.local';
+const SEED_SELLER_PASSWORD = 'Seller123!Pass';
 
 async function main() {
   // --- Shop (single tenant for Phase 1) ---
@@ -22,11 +26,13 @@ async function main() {
   });
 
   // --- Seller/admin user + profile ---
+  const passwordHash = await hashPassword(SEED_SELLER_PASSWORD);
   const seller = await prisma.user.upsert({
-    where: { email: 'seller@artisan.local' },
-    update: {},
+    where: { email: SEED_SELLER_EMAIL },
+    update: { passwordHash, shopId: shop.id },
     create: {
-      email: 'seller@artisan.local',
+      email: SEED_SELLER_EMAIL,
+      passwordHash,
       role: 'ADMIN',
       displayName: 'Shop Owner',
       shopId: shop.id,

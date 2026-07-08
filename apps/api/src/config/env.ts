@@ -48,6 +48,20 @@ const envSchema = z.object({
   // Optional cookie domain (leave unset for host-only cookies in local dev).
   COOKIE_DOMAIN: z.string().optional(),
 
+  // Object storage (S3-compatible; MinIO in local dev). Optional — the media
+  // endpoints report unavailable until these are configured.
+  S3_ENDPOINT: z.string().url().optional(),
+  S3_REGION: z.string().default('us-east-1'),
+  S3_ACCESS_KEY: z.string().optional(),
+  S3_SECRET_KEY: z.string().optional(),
+  S3_BUCKET: z.string().optional(),
+  // Public base URL for serving objects (defaults to `${S3_ENDPOINT}/${bucket}`).
+  S3_PUBLIC_URL: z.string().url().optional(),
+  S3_FORCE_PATH_STYLE: z
+    .string()
+    .default('true')
+    .transform((value) => value !== 'false'),
+
   // Trust the first proxy hop (needed for correct client IPs / rate limiting
   // behind a reverse proxy). Disabled by default for local development.
   TRUST_PROXY: z
@@ -142,3 +156,8 @@ export const env = loadEnv();
 
 export const isProduction = env.NODE_ENV === 'production';
 export const isTest = env.NODE_ENV === 'test';
+
+/** Whether S3-compatible object storage is fully configured. */
+export const isStorageConfigured = Boolean(
+  env.S3_ENDPOINT && env.S3_ACCESS_KEY && env.S3_SECRET_KEY && env.S3_BUCKET,
+);

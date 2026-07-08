@@ -9,7 +9,6 @@ import type { AuthUser } from '../modules/auth/auth.types.js';
  * (OWASP A03 — validate at the boundary). `user` is set by `requireAuth`.
  */
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       validated: {

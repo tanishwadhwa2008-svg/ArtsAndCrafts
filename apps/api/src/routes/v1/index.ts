@@ -1,13 +1,17 @@
 import { Router } from 'express';
 import type { ApiSuccess } from '@arts/shared';
 import { authRouter } from '../../modules/auth/auth.routes.js';
+import { categoriesRouter } from '../../modules/catalog/categories/categories.routes.js';
+import { productsRouter } from '../../modules/catalog/products/products.routes.js';
+import { inventoryRouter } from '../../modules/inventory/inventory.routes.js';
+import { mediaRouter } from '../../modules/media/media.routes.js';
 
 /**
  * Version 1 API router.
  *
  * Feature routers (products, categories, inventory, media, ...) are mounted
- * here in later phases. Versioning the router lets us evolve the API without
- * breaking existing clients — a `/api/v2` can be introduced side by side later.
+ * here. Versioning the router lets us evolve the API without breaking existing
+ * clients — a `/api/v2` can be introduced side by side later.
  */
 export const v1Router = Router();
 
@@ -20,3 +24,7 @@ v1Router.get('/', (_req, res) => {
 });
 
 v1Router.use('/auth', authRouter);
+v1Router.use('/categories', categoriesRouter);
+v1Router.use('/products', productsRouter);
+v1Router.use('/inventory', inventoryRouter);
+v1Router.use('/media', mediaRouter);

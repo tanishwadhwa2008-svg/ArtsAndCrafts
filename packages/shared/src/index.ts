@@ -9,3 +9,7 @@
 export * from './roles.js';
 export * from './http.js';
 export * from './schemas/auth.js';
+export * from './schemas/common.js';
+export * from './schemas/catalog.js';
+export * from './schemas/inventory.js';
+export * from './schemas/media.js';
