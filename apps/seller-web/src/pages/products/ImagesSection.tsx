@@ -3,6 +3,7 @@ import { ImagePlus, Star, Trash2 } from 'lucide-react';
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_BYTES, type UploadUrlInput } from '@arts/shared';
 import type { ProductImage } from '../../api/catalog.js';
 import { requestUploadUrl, uploadToStorage } from '../../api/catalog.js';
+import { compressImage } from '../../lib/image-compression.js';
 import { useAddImage, useDeleteImage, useSetPrimaryImage } from '../../hooks/mutations.js';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card.js';
 import { Button } from '../../components/ui/button.js';
@@ -31,18 +32,20 @@ export function ImagesSection({
       setError('Unsupported file type. Use JPEG, PNG, WebP or GIF.');
       return;
     }
-    if (file.size > MAX_UPLOAD_BYTES) {
-      setError('File is too large (max 5 MB).');
-      return;
-    }
     setUploading(true);
     try {
+      // Optimize in the browser first so only the compressed payload is uploaded.
+      const { file: optimized } = await compressImage(file);
+      if (optimized.size > MAX_UPLOAD_BYTES) {
+        setError('File is too large (max 5 MB after optimization).');
+        return;
+      }
       const target = await requestUploadUrl({
-        fileName: file.name,
-        contentType: file.type as UploadUrlInput['contentType'],
-        size: file.size,
+        fileName: optimized.name,
+        contentType: optimized.type as UploadUrlInput['contentType'],
+        size: optimized.size,
       });
-      await uploadToStorage(target.uploadUrl, file);
+      await uploadToStorage(target.uploadUrl, optimized);
       await addMut.mutateAsync({
         storageKey: target.storageKey,
         url: target.publicUrl,
