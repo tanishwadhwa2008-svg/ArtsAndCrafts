@@ -12,10 +12,19 @@
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "clean": "rimraf dist .turbo"
+    "clean": "rimraf dist .turbo",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@arts/shared": "workspace:*",
+    "@prisma/client": "^6.1.0",
     "express": "^4.21.1"
   },
   "devDependencies": {
@@ -23,6 +32,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.8.1",
     "eslint": "^9.13.0",
+    "prisma": "^6.1.0",
     "rimraf": "^6.0.1",
     "tsx": "^4.19.1",
     "typescript": "^5.6.3",

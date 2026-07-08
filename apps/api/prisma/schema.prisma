@@ -1,0 +1,339 @@
+// Prisma schema — Arts & Handicrafts platform data model.
+//
+// Phase 1 focuses on the SINGLE-SHOP seller portal, but the schema is
+// intentionally future-proofed: a `Shop` (tenant) scope exists on every
+// domain table, and Customer / Order / WholesaleAccount stubs are included
+// so future customer & wholesale apps can be added with purely additive
+// migrations.
+//
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+/// Platform-wide roles. SELLER/ADMIN are used in Phase 1; CUSTOMER and
+/// WHOLESALE are declared now so later apps need no breaking migration.
+enum Role {
+  ADMIN
+  SELLER
+  CUSTOMER
+  WHOLESALE
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FULFILLED
+  CANCELLED
+  REFUNDED
+}
+
+enum WholesaleStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+// ---------------------------------------------------------------------------
+// Tenancy & identity
+// ---------------------------------------------------------------------------
+
+/// A shop/tenant. Phase 1 runs a single shop, but everything is scoped to a
+/// Shop so multi-tenant/customer/wholesale expansion stays additive.
+model Shop {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  logoUrl     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users      User[]
+  categories Category[]
+  products   Product[]
+  orders     Order[]
+
+  @@map("shops")
+}
+
+/// Authentication & authorization principal. Credentials (passwordHash) are
+/// stored here for the self-managed JWT strategy implemented in Phase 3.
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String?
+  role         Role      @default(SELLER)
+  displayName  String?
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // A seller/admin belongs to a shop (nullable to allow platform admins).
+  shopId String?
+  shop   Shop?   @relation(fields: [shopId], references: [id], onDelete: SetNull)
+
+  sellerProfile SellerProfile?
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+
+  @@index([shopId])
+  @@map("users")
+}
+
+/// Rotating refresh-token store (used by Phase 3 auth). Tokens are stored
+/// hashed; `revokedAt` + `replacedByToken` enable reuse detection.
+model RefreshToken {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash       String    @unique
+  expiresAt       DateTime
+  revokedAt       DateTime?
+  replacedByToken String?
+  createdByIp     String?
+  createdAt       DateTime  @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+/// Public-facing profile for a seller/artisan.
+model SellerProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio         String?
+  avatarUrl   String?
+  phone       String?
+  websiteUrl  String?
+  socialLinks Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("seller_profiles")
+}
+
+// ---------------------------------------------------------------------------
+// Catalog
+// ---------------------------------------------------------------------------
+
+/// Product category. Self-referencing to support nested categories.
+model Category {
+  id          String   @id @default(cuid())
+  shopId      String
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String
+  description String?
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parentId String?
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
+  products Product[]
+
+  @@unique([shopId, slug])
+  @@index([shopId])
+  @@index([parentId])
+  @@map("categories")
+}
+
+/// A sellable product. Pricing lives on variants; `basePrice` is the default
+/// shown when a product has a single implicit variant.
+model Product {
+  id          String        @id @default(cuid())
+  shopId      String
+  shop        Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  category    Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  title       String
+  slug        String
+  description String?
+  status      ProductStatus @default(DRAFT)
+  basePrice   Decimal       @db.Decimal(12, 2)
+  currency    String        @default("USD")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  variants   ProductVariant[]
+  images     ProductImage[]
+  orderItems OrderItem[]
+
+  @@unique([shopId, slug])
+  @@index([shopId])
+  @@index([categoryId])
+  @@index([status])
+  @@map("products")
+}
+
+/// A specific purchasable variant of a product (size, color, etc.).
+model ProductVariant {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku        String   @unique
+  name       String
+  price      Decimal? @db.Decimal(12, 2)
+  attributes Json?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  inventory  Inventory?
+  orderItems OrderItem[]
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+/// Media attached to a product. `storageKey` is the object-storage key
+/// (MinIO/S3); `url` is the resolved public/CDN URL.
+model ProductImage {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  storageKey String
+  url        String
+  altText    String?
+  position   Int      @default(0)
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+/// Stock tracking, one row per variant.
+model Inventory {
+  id                String   @id @default(cuid())
+  variantId         String   @unique
+  variant           ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity          Int      @default(0)
+  reserved          Int      @default(0)
+  lowStockThreshold Int      @default(5)
+  updatedAt         DateTime @updatedAt
+
+  @@map("inventory")
+}
+
+// ---------------------------------------------------------------------------
+// Commerce foundations (stubs for future customer/wholesale phases)
+// ---------------------------------------------------------------------------
+
+/// Customer account. Not used by the seller portal directly, but present so
+/// orders can reference customers once the customer app is built.
+model Customer {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  displayName String?
+  phone       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders           Order[]
+  wholesaleAccount WholesaleAccount?
+
+  @@map("customers")
+}
+
+/// Wholesale account foundation for the future wholesale app.
+model WholesaleAccount {
+  id           String          @id @default(cuid())
+  customerId   String          @unique
+  customer     Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  companyName  String
+  taxId        String?
+  status       WholesaleStatus @default(PENDING)
+  discountRate Decimal         @default(0) @db.Decimal(5, 2)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@map("wholesale_accounts")
+}
+
+/// Order foundation. Scoped to a shop; customer is nullable to allow
+/// guest/seller-created orders later.
+model Order {
+  id          String      @id @default(cuid())
+  shopId      String
+  shop        Shop        @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customerId  String?
+  customer    Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  status      OrderStatus @default(PENDING)
+  currency    String      @default("USD")
+  totalAmount Decimal     @default(0) @db.Decimal(12, 2)
+  placedAt    DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  items OrderItem[]
+
+  @@index([shopId])
+  @@index([customerId])
+  @@index([status])
+  @@map("orders")
+}
+
+/// Line item within an order.
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  titleSnapshot String
+  unitPrice     Decimal @db.Decimal(12, 2)
+  quantity      Int
+  createdAt     DateTime @default(now())
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+// ---------------------------------------------------------------------------
+// Observability (OWASP A09 foundation)
+// ---------------------------------------------------------------------------
+
+/// Append-only audit trail for security-sensitive actions.
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String?
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
