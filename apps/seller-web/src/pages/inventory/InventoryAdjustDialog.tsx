@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { InventoryItem } from '../../api/catalog.js';
 import { useAdjustInventory } from '../../hooks/mutations.js';
+import { useToast } from '../../components/ui/toast.js';
 import { ApiError } from '../../lib/api.js';
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from '../../components/ui/dialog.js';
 import { Field } from '../../components/ui/form-field.js';
@@ -18,6 +19,7 @@ export function InventoryAdjustDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const adjustMut = useAdjustInventory();
+  const toast = useToast();
   const [quantity, setQuantity] = useState(0);
   const [threshold, setThreshold] = useState(0);
 
@@ -42,6 +44,7 @@ export function InventoryAdjustDialog({
           expectedVersion: item.version,
         },
       });
+      toast.success('Stock updated.');
       onOpenChange(false);
     } catch {
       /* surfaced below */

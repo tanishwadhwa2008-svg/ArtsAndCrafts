@@ -17,6 +17,8 @@ import '@fontsource/manrope/700.css';
 
 import App from './App.tsx';
 import { AuthProvider } from './auth/AuthProvider.tsx';
+import { ToastProvider } from './components/ui/toast.tsx';
+import { ConfirmProvider } from './components/ui/confirm.tsx';
 import './index.css';
 
 const rootElement = document.getElementById('root');
@@ -34,9 +36,13 @@ createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <ToastProvider>
+          <ConfirmProvider>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </ConfirmProvider>
+        </ToastProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,

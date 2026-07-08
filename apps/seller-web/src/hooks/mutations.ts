@@ -82,6 +82,18 @@ export function useAddVariant(productId: string) {
   });
 }
 
+export function useUpdateVariant(productId: string) {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: (args: { variantId: string; body: Parameters<typeof api.updateVariant>[1] }) =>
+      api.updateVariant(args.variantId, args.body),
+    onSuccess: () => {
+      inv.product(productId);
+      inv.inventory();
+    },
+  });
+}
+
 export function useDeleteVariant(productId: string) {
   const inv = useInvalidators();
   return useMutation({
@@ -107,6 +119,15 @@ export function useSetPrimaryImage(productId: string) {
   const inv = useInvalidators();
   return useMutation({
     mutationFn: api.setPrimaryImage,
+    onSuccess: () => inv.product(productId),
+  });
+}
+
+export function useUpdateImage(productId: string) {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: (args: { imageId: string; body: Parameters<typeof api.updateImage>[1] }) =>
+      api.updateImage(args.imageId, args.body),
     onSuccess: () => inv.product(productId),
   });
 }

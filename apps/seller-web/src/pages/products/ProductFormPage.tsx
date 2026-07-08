@@ -6,6 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import { SUPPORTED_CURRENCIES, createProductSchema, type CreateProductInput } from '@arts/shared';
 import { useCategories, useProduct } from '../../hooks/queries.js';
 import { useCreateProduct, useUpdateProduct } from '../../hooks/mutations.js';
+import { useToast } from '../../components/ui/toast.js';
 import { ApiError } from '../../lib/api.js';
 import { PageHeader } from '../../components/ui/page-header.js';
 import { Card, CardContent } from '../../components/ui/card.js';
@@ -37,6 +38,7 @@ export function ProductFormPage() {
   const categories = useCategories();
   const createMut = useCreateProduct();
   const updateMut = useUpdateProduct();
+  const toast = useToast();
 
   const {
     register,
@@ -80,8 +82,10 @@ export function ProductFormPage() {
     try {
       if (isEdit && id) {
         await updateMut.mutateAsync({ id, body: values });
+        toast.success('Product saved.');
       } else {
         const created = await createMut.mutateAsync(values);
+        toast.success('Product created.');
         navigate(`/products/${created.id}/edit`, { replace: true });
       }
     } catch {

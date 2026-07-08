@@ -1,10 +1,18 @@
 import { useRef, useState } from 'react';
-import { ImagePlus, Star, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ImagePlus, Star, Trash2 } from 'lucide-react';
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_BYTES, type UploadUrlInput } from '@arts/shared';
 import type { ProductImage } from '../../api/catalog.js';
 import { requestUploadUrl, uploadToStorage } from '../../api/catalog.js';
 import { compressImage } from '../../lib/image-compression.js';
-import { useAddImage, useDeleteImage, useSetPrimaryImage } from '../../hooks/mutations.js';
+import {
+  useAddImage,
+  useDeleteImage,
+  useSetPrimaryImage,
+  useUpdateImage,
+} from '../../hooks/mutations.js';
+import { useToast } from '../../components/ui/toast.js';
+import { useConfirm } from '../../components/ui/confirm.js';
+import { ApiError } from '../../lib/api.js';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card.js';
 import { Button } from '../../components/ui/button.js';
 import { Badge } from '../../components/ui/badge.js';
@@ -24,7 +32,50 @@ export function ImagesSection({
 
   const addMut = useAddImage(productId);
   const setPrimaryMut = useSetPrimaryImage(productId);
+  const updateMut = useUpdateImage(productId);
   const deleteMut = useDeleteImage(productId);
+  const toast = useToast();
+  const confirm = useConfirm();
+
+  const sorted = [...images].sort((a, b) => a.position - b.position);
+
+  const move = async (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= sorted.length) return;
+    const current = sorted[index];
+    const neighbor = sorted[target];
+    if (!current || !neighbor) return;
+    try {
+      await Promise.all([
+        updateMut.mutateAsync({ imageId: current.id, body: { position: neighbor.position } }),
+        updateMut.mutateAsync({ imageId: neighbor.id, body: { position: current.position } }),
+      ]);
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : 'Failed to reorder images.');
+    }
+  };
+
+  const setPrimary = (img: ProductImage) => {
+    setPrimaryMut.mutate(img.id, {
+      onSuccess: () => toast.success('Primary image updated.'),
+      onError: (e) =>
+        toast.error(e instanceof ApiError ? e.message : 'Failed to set primary image.'),
+    });
+  };
+
+  const removeImage = async (img: ProductImage) => {
+    const ok = await confirm({
+      title: 'Delete image',
+      message: 'Remove this image from the product?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
+    deleteMut.mutate(img.id, {
+      onSuccess: () => toast.success('Image deleted.'),
+      onError: (e) => toast.error(e instanceof ApiError ? e.message : 'Failed to delete image.'),
+    });
+  };
 
   const handleFile = async (file: File) => {
     setError(null);
@@ -52,8 +103,11 @@ export function ImagesSection({
         position: images.length,
         isPrimary: images.length === 0,
       });
+      toast.success('Image uploaded.');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Upload failed.');
+      const message = e instanceof Error ? e.message : 'Upload failed.';
+      setError(message);
+      toast.error(message);
     } finally {
       setUploading(false);
     }
@@ -79,7 +133,7 @@ export function ImagesSection({
 
         {images.length > 0 ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {images.map((img) => (
+            {sorted.map((img, index) => (
               <div
                 key={img.id}
                 className={cn(
@@ -97,27 +151,51 @@ export function ImagesSection({
                     Primary
                   </Badge>
                 ) : null}
-                <div className="absolute inset-x-0 bottom-0 flex justify-end gap-1 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
-                  {!img.isPrimary ? (
+                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="flex gap-1">
                     <Button
                       variant="ghost"
                       size="icon"
-                      aria-label="Set as primary"
-                      className="text-gold-300"
-                      onClick={() => setPrimaryMut.mutate(img.id)}
+                      aria-label="Move left"
+                      className="text-fg disabled:opacity-30"
+                      disabled={index === 0 || updateMut.isPending}
+                      onClick={() => void move(index, -1)}
                     >
-                      <Star className="h-4 w-4" />
+                      <ArrowLeft className="h-4 w-4" />
                     </Button>
-                  ) : null}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Delete image"
-                    className="text-danger"
-                    onClick={() => deleteMut.mutate(img.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Move right"
+                      className="text-fg disabled:opacity-30"
+                      disabled={index === sorted.length - 1 || updateMut.isPending}
+                      onClick={() => void move(index, 1)}
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex gap-1">
+                    {!img.isPrimary ? (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Set as primary"
+                        className="text-gold-300"
+                        onClick={() => setPrimary(img)}
+                      >
+                        <Star className="h-4 w-4" />
+                      </Button>
+                    ) : null}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Delete image"
+                      className="text-danger"
+                      onClick={() => void removeImage(img)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}

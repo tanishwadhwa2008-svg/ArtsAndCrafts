@@ -4,6 +4,9 @@ import { ChevronLeft, ChevronRight, Pencil, Plus, Search, Trash2 } from 'lucide-
 import type { Product } from '../api/catalog.js';
 import { useProducts } from '../hooks/queries.js';
 import { useDeleteProduct } from '../hooks/mutations.js';
+import { useToast } from '../components/ui/toast.js';
+import { useConfirm } from '../components/ui/confirm.js';
+import { ApiError } from '../lib/api.js';
 import { PageHeader } from '../components/ui/page-header.js';
 import { Button } from '../components/ui/button.js';
 import { Input } from '../components/ui/input.js';
@@ -24,6 +27,8 @@ export function ProductsPage() {
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const deleteMut = useDeleteProduct();
+  const toast = useToast();
+  const confirm = useConfirm();
 
   const { data, isLoading, isError } = useProducts({
     page,
@@ -37,10 +42,18 @@ export function ProductsPage() {
     setSearch(searchInput.trim());
   };
 
-  const remove = (product: Product) => {
-    if (window.confirm(`Delete product "${product.title}"?`)) {
-      deleteMut.mutate(product.id);
-    }
+  const remove = async (product: Product) => {
+    const ok = await confirm({
+      title: 'Delete product',
+      message: `Delete product "${product.title}"? This also removes its variants and images.`,
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
+    deleteMut.mutate(product.id, {
+      onSuccess: () => toast.success('Product deleted.'),
+      onError: (e) => toast.error(e instanceof ApiError ? e.message : 'Failed to delete product.'),
+    });
   };
 
   const meta = data?.meta;
@@ -125,7 +138,7 @@ export function ProductsPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => remove(p)}
+                        onClick={() => void remove(p)}
                         aria-label="Delete"
                         className="text-danger/80 hover:text-danger"
                       >

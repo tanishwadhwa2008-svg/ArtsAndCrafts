@@ -6,6 +6,7 @@ import type {
   CreateVariantInput,
   Paginated,
   UpdateCategoryInput,
+  UpdateImageInput,
   UpdateProductInput,
   UpdateVariantInput,
   UploadUrlInput,
@@ -165,6 +166,10 @@ export function setPrimaryImage(imageId: string): Promise<ProductImage> {
     method: 'PATCH',
     body: { isPrimary: true },
   });
+}
+
+export function updateImage(imageId: string, body: UpdateImageInput): Promise<ProductImage> {
+  return apiRequest<ProductImage>(`/products/images/${imageId}`, { method: 'PATCH', body });
 }
 
 export function deleteImage(imageId: string): Promise<void> {

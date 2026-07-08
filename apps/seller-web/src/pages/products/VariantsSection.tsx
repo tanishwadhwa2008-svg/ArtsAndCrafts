@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { createVariantSchema, type CreateVariantInput } from '@arts/shared';
 import type { Variant } from '../../api/catalog.js';
 import { useAddVariant, useDeleteVariant } from '../../hooks/mutations.js';
+import { useToast } from '../../components/ui/toast.js';
+import { useConfirm } from '../../components/ui/confirm.js';
+import { ApiError } from '../../lib/api.js';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card.js';
 import { Field } from '../../components/ui/form-field.js';
 import { Input } from '../../components/ui/input.js';
@@ -11,6 +15,7 @@ import { Button } from '../../components/ui/button.js';
 import { Badge } from '../../components/ui/badge.js';
 import { Spinner } from '../../components/ui/spinner.js';
 import { Table, TBody, TD, TH, THead, TR } from '../../components/ui/table.js';
+import { VariantEditDialog } from './VariantEditDialog.js';
 
 export function VariantsSection({
   productId,
@@ -21,6 +26,9 @@ export function VariantsSection({
 }) {
   const addMut = useAddVariant(productId);
   const deleteMut = useDeleteVariant(productId);
+  const toast = useToast();
+  const confirm = useConfirm();
+  const [editing, setEditing] = useState<Variant | null>(null);
 
   const {
     register,
@@ -33,9 +41,30 @@ export function VariantsSection({
   });
 
   const onAdd = handleSubmit(async (values) => {
-    await addMut.mutateAsync(values);
-    reset({ sku: '', name: '', isActive: true });
+    try {
+      await addMut.mutateAsync(values);
+      reset({ sku: '', name: '', isActive: true });
+      toast.success('Variant added.');
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : 'Failed to add variant.');
+    }
   });
+
+  const removeVariant = async (v: Variant) => {
+    const ok = await confirm({
+      title: 'Delete variant',
+      message: `Delete variant "${v.name}"? This also removes its inventory record.`,
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
+    try {
+      await deleteMut.mutateAsync(v.id);
+      toast.success('Variant deleted.');
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : 'Failed to delete variant.');
+    }
+  };
 
   return (
     <Card>
@@ -70,15 +99,21 @@ export function VariantsSection({
                     )}
                   </TD>
                   <TD>
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Edit variant"
+                        onClick={() => setEditing(v)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
                         aria-label="Delete variant"
                         className="text-danger/80 hover:text-danger"
-                        onClick={() => {
-                          if (window.confirm(`Delete variant "${v.name}"?`)) deleteMut.mutate(v.id);
-                        }}
+                        onClick={() => void removeVariant(v)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -115,6 +150,13 @@ export function VariantsSection({
           </div>
         </form>
       </CardContent>
+
+      <VariantEditDialog
+        productId={productId}
+        variant={editing}
+        open={editing !== null}
+        onOpenChange={(open) => (open ? undefined : setEditing(null))}
+      />
     </Card>
   );
 }

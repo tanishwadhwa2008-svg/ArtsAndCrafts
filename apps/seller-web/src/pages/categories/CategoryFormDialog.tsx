@@ -1,13 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createCategorySchema, type CreateCategoryInput } from '@arts/shared';
 import type { Category } from '../../api/catalog.js';
+import { useCategories } from '../../hooks/queries.js';
 import { useCreateCategory, useUpdateCategory } from '../../hooks/mutations.js';
+import { useToast } from '../../components/ui/toast.js';
 import { ApiError } from '../../lib/api.js';
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from '../../components/ui/dialog.js';
 import { Field } from '../../components/ui/form-field.js';
 import { Input } from '../../components/ui/input.js';
+import { Select } from '../../components/ui/select.js';
 import { Textarea } from '../../components/ui/textarea.js';
 import { Button } from '../../components/ui/button.js';
 import { Spinner } from '../../components/ui/spinner.js';
@@ -18,6 +21,29 @@ function slugify(value: string): string {
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+/** Collects the id set that cannot be a parent: the category itself + descendants. */
+function collectForbiddenParents(categories: Category[], selfId: string): Set<string> {
+  const childrenByParent = new Map<string, Category[]>();
+  for (const c of categories) {
+    if (!c.parentId) continue;
+    const list = childrenByParent.get(c.parentId) ?? [];
+    list.push(c);
+    childrenByParent.set(c.parentId, list);
+  }
+  const forbidden = new Set<string>([selfId]);
+  const stack = [selfId];
+  while (stack.length > 0) {
+    const current = stack.pop() as string;
+    for (const child of childrenByParent.get(current) ?? []) {
+      if (!forbidden.has(child.id)) {
+        forbidden.add(child.id);
+        stack.push(child.id);
+      }
+    }
+  }
+  return forbidden;
 }
 
 export function CategoryFormDialog({
@@ -32,6 +58,15 @@ export function CategoryFormDialog({
   const isEdit = Boolean(category);
   const createMut = useCreateCategory();
   const updateMut = useUpdateCategory();
+  const toast = useToast();
+  const { data: categories } = useCategories();
+
+  const parentOptions = useMemo(() => {
+    const all = categories ?? [];
+    if (!category) return all;
+    const forbidden = collectForbiddenParents(all, category.id);
+    return all.filter((c) => !forbidden.has(c.id));
+  }, [categories, category]);
 
   const {
     register,
@@ -51,6 +86,7 @@ export function CategoryFormDialog({
         name: category?.name ?? '',
         slug: category?.slug ?? '',
         description: category?.description ?? '',
+        parentId: category?.parentId ?? undefined,
         position: category?.position ?? 0,
       });
     }
@@ -62,8 +98,10 @@ export function CategoryFormDialog({
     try {
       if (isEdit && category) {
         await updateMut.mutateAsync({ id: category.id, body: values });
+        toast.success('Category updated.');
       } else {
         await createMut.mutateAsync(values);
+        toast.success('Category created.');
       }
       onOpenChange(false);
     } catch {
@@ -105,6 +143,25 @@ export function CategoryFormDialog({
 
           <Field label="Description" htmlFor="cat-desc" error={errors.description?.message}>
             <Textarea id="cat-desc" {...register('description')} />
+          </Field>
+
+          <Field
+            label="Parent category"
+            htmlFor="cat-parent"
+            error={errors.parentId?.message}
+            hint="Optional. Nest this category under another."
+          >
+            <Select
+              id="cat-parent"
+              {...register('parentId', { setValueAs: (v) => (v ? v : undefined) })}
+            >
+              <option value="">— None (top level) —</option>
+              {parentOptions.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </Select>
           </Field>
 
           <Field label="Position" htmlFor="cat-pos" error={errors.position?.message}>

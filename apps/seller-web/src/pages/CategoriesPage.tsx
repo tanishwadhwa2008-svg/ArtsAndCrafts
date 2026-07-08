@@ -3,6 +3,9 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import type { Category } from '../api/catalog.js';
 import { useCategories } from '../hooks/queries.js';
 import { useDeleteCategory } from '../hooks/mutations.js';
+import { useToast } from '../components/ui/toast.js';
+import { useConfirm } from '../components/ui/confirm.js';
+import { ApiError } from '../lib/api.js';
 import { PageHeader } from '../components/ui/page-header.js';
 import { Button } from '../components/ui/button.js';
 import { Spinner } from '../components/ui/spinner.js';
@@ -12,6 +15,8 @@ import { CategoryFormDialog } from './categories/CategoryFormDialog.js';
 export function CategoriesPage() {
   const { data, isLoading, isError } = useCategories();
   const deleteMut = useDeleteCategory();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
 
@@ -23,10 +28,19 @@ export function CategoriesPage() {
     setEditing(category);
     setDialogOpen(true);
   };
-  const remove = (category: Category) => {
-    if (window.confirm(`Delete category "${category.name}"?`)) {
-      deleteMut.mutate(category.id);
-    }
+  const remove = async (category: Category) => {
+    const ok = await confirm({
+      title: 'Delete category',
+      message: `Delete category "${category.name}"?`,
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
+    deleteMut.mutate(category.id, {
+      onSuccess: () => toast.success('Category deleted.'),
+      onError: (e) =>
+        toast.error(e instanceof ApiError ? e.message : 'Failed to delete category.'),
+    });
   };
 
   return (
@@ -79,7 +93,7 @@ export function CategoriesPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => remove(c)}
+                      onClick={() => void remove(c)}
                       aria-label="Delete"
                       className="text-danger/80 hover:text-danger"
                     >
