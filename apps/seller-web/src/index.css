@@ -1,1 +1,94 @@
 @import 'tailwindcss';
+
+/*
+ * Arts & Handicrafts — luxury theme (toned-down for the seller dashboard).
+ * Black canvas, molten-gold accents, serif display headings.
+ */
+@theme {
+  /* Surfaces */
+  --color-bg: #0a0a0b;
+  --color-surface: #16120b;
+  --color-surface-2: #1e180f;
+  --color-elevated: #271f13;
+
+  /* Gold accent scale */
+  --color-gold-300: #f6de8b;
+  --color-gold-400: #f2ce5b;
+  --color-gold-500: #e3b23c;
+  --color-gold-600: #c8901f;
+  --color-gold-700: #9c6f16;
+
+  /* Text */
+  --color-fg: #edeae3;
+  --color-muted: #a9a29a;
+  --color-faint: #6e675e;
+
+  /* Lines & states */
+  --color-line: rgba(227, 178, 60, 0.16);
+  --color-line-strong: rgba(227, 178, 60, 0.32);
+  --color-danger: #e5484d;
+  --color-success: #43b581;
+
+  /* Typography */
+  --font-display: 'Cinzel', ui-serif, serif;
+  --font-serif: 'Cormorant Garamond', ui-serif, serif;
+  --font-sans: 'Jost', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    /* Subtle radial gold vignette + deep base. */
+    background-image:
+      radial-gradient(1200px 600px at 85% -10%, rgba(227, 178, 60, 0.06), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(227, 178, 60, 0.04), transparent 55%);
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
+    font-weight: 600;
+  }
+
+  ::selection {
+    background: rgba(227, 178, 60, 0.28);
+    color: #fff;
+  }
+
+  /* Luxe thin scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gold-700) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--color-gold-700);
+    border-radius: 9999px;
+    border: 3px solid var(--color-bg);
+  }
+}
+
+/* Reusable eyebrow label (Cormorant, gold, spaced) */
+@utility eyebrow {
+  font-family: var(--font-serif);
+  color: var(--color-gold-500);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+

@@ -1,10 +1,34 @@
+import { Route, Routes } from 'react-router-dom';
+import { RedirectIfAuthed, RequireAuth } from './auth/guards.js';
+import { AppLayout } from './components/layout/AppLayout.js';
+import { LoginPage } from './pages/LoginPage.js';
+import { DashboardPage } from './pages/DashboardPage.js';
+import { ProductsPage } from './pages/ProductsPage.js';
+import { CategoriesPage } from './pages/CategoriesPage.js';
+import { InventoryPage } from './pages/InventoryPage.js';
+import { SettingsPage } from './pages/SettingsPage.js';
+
 export default function App() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-neutral-50 text-neutral-900">
-      <div className="max-w-md text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Arts &amp; Handicrafts</h1>
-        <p className="mt-2 text-neutral-600">Seller Portal — foundation ready (Phase 0).</p>
-      </div>
-    </main>
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          <RedirectIfAuthed>
+            <LoginPage />
+          </RedirectIfAuthed>
+        }
+      />
+
+      <Route element={<RequireAuth />}>
+        <Route element={<AppLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="products" element={<ProductsPage />} />
+          <Route path="categories" element={<CategoriesPage />} />
+          <Route path="inventory" element={<InventoryPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }

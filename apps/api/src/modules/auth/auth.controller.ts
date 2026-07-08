@@ -6,11 +6,18 @@ import { REFRESH_COOKIE, clearAuthCookies, setAuthCookies } from '../../lib/cook
 import type { AuthResult, AuthUser } from './auth.types.js';
 import * as authService from './auth.service.js';
 
-/** Shapes the client-facing auth payload: user + access token (in body). */
-function authPayload(result: AuthResult): ApiSuccess<{ user: AuthUser; accessToken: string }> {
+/** Shapes the client-facing auth payload: user, access token, and the CSRF
+ * token (not secret) so an SPA can echo it on cookie-authenticated calls. */
+function authPayload(
+  result: AuthResult,
+): ApiSuccess<{ user: AuthUser; accessToken: string; csrfToken: string }> {
   return {
     ok: true,
-    data: { user: result.user, accessToken: result.tokens.accessToken },
+    data: {
+      user: result.user,
+      accessToken: result.tokens.accessToken,
+      csrfToken: result.tokens.csrfToken,
+    },
   };
 }
 
