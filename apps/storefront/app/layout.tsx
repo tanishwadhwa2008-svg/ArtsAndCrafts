@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: '%s · Arts and Crafts of India',
   },
   description:
-    'A curated collection of handcrafted art and heritage pieces, each carrying the story of its maker.',
+    'A curated collection of handcrafted Indian art and heritage pieces — each carrying the story of its maker and the centuries-old tradition it belongs to.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
