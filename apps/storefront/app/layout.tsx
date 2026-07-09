@@ -19,8 +19,8 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Artisan Collective — Handcrafted Heritage',
-    template: '%s · Artisan Collective',
+    default: 'Arts and Crafts of India — Handcrafted Heritage',
+    template: '%s · Arts and Crafts of India',
   },
   description:
     'A curated collection of handcrafted art and heritage pieces, each carrying the story of its maker.',
