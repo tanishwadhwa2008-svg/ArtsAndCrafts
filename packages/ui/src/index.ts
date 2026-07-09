@@ -22,6 +22,7 @@ export * from './components/ui/label.js';
 export * from './components/ui/page-header.js';
 export * from './components/ui/select.js';
 export * from './components/ui/spinner.js';
+export * from './components/ui/switch.js';
 export * from './components/ui/table.js';
 export * from './components/ui/textarea.js';
 export * from './components/ui/toast.js';
