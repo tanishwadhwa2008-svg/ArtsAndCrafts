@@ -17,7 +17,6 @@ import '@fontsource/manrope/700.css';
 
 import './globals.css';
 
-import { AnnouncementBar } from '@/components/site/announcement-bar';
 import { Footer } from '@/components/site/footer';
 import { Header } from '@/components/site/header';
 import { env } from '@/lib/env';
@@ -43,7 +42,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         <div className="flex min-h-screen flex-col">
-          <AnnouncementBar />
           <Header />
           <main id="main-content" className="flex-1">
             {children}

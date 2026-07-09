@@ -3,6 +3,7 @@ import { Button } from '@arts/ui';
 import { getHomeFeed } from '@/lib/storefront';
 import { ProductCard } from '@/components/shop/product-card';
 import { CollectionCard } from '@/components/shop/collection-card';
+import { OrnateFrame, Paisley } from '@/components/site/ornaments';
 
 // Always render against the current catalogue (in sync with inventory/images).
 export const dynamic = 'force-dynamic';
@@ -14,24 +15,45 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="mx-auto flex min-h-[68vh] max-w-4xl flex-col items-center justify-center px-6 py-24 text-center">
-        <p className="eyebrow mb-5">Arts and Crafts of India</p>
+      <section className="relative isolate overflow-hidden">
+        {/* Silk grain + warm gold sheen behind the frame. */}
+        <div
+          aria-hidden="true"
+          className="texture-silk pointer-events-none absolute inset-0 -z-20 opacity-[0.06]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(72%_60%_at_50%_-10%,rgba(201,159,74,0.14),transparent_70%)]"
+        />
+        {/* Paisley watermark, top-right. */}
+        <Paisley className="pointer-events-none absolute -right-12 -top-10 -z-10 h-80 w-80 text-gold-500/[0.06] sm:h-[26rem] sm:w-[26rem]" />
 
-        <h1 className="font-display text-4xl leading-[1.1] text-gold-300 sm:text-6xl">
-          Handcrafted heritage,
-          <br />
-          curated for the world.
-        </h1>
+        <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
+          <OrnateFrame className="flex flex-col items-center px-6 py-16 text-center sm:px-12 sm:py-20">
+            <p className="eyebrow mb-5">Arts and Crafts of India</p>
 
-        <p className="mt-7 max-w-xl font-serif text-lg italic leading-relaxed text-muted sm:text-xl">
-          A living archive of master craftsmanship — every piece carrying the
-          story of its maker, its materials, and the tradition it belongs to.
-        </p>
+            <h1 className="bg-gradient-to-br from-gold-300 via-gold-400 to-gold-600 bg-clip-text font-display text-4xl leading-[1.12] text-transparent sm:text-5xl">
+              Handcrafted heritage,
+              <br />
+              curated for the world.
+            </h1>
 
-        <div className="mt-11">
-          <Button asChild variant="luxury" size="lg">
-            <Link href="/collections">Explore the collection</Link>
-          </Button>
+            <p className="mt-7 max-w-xl font-serif text-lg italic leading-relaxed text-muted sm:text-xl">
+              A living archive of master craftsmanship — every piece carrying the
+              story of its maker, its materials, and the tradition it belongs to.
+            </p>
+
+            <div className="mt-11">
+              <Button
+                asChild
+                variant="luxury"
+                size="lg"
+                className="max-w-full px-5 text-xs sm:px-6 sm:text-base"
+              >
+                <Link href="/collections">Explore the collection</Link>
+              </Button>
+            </div>
+          </OrnateFrame>
         </div>
       </section>
 

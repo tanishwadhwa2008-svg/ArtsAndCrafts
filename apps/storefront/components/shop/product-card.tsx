@@ -6,7 +6,7 @@ import { formatPrice } from '@/lib/format';
 export function ProductCard({ product }: { product: ProductCardData }) {
   return (
     <Link href={`/products/${product.slug}`} className="group block focus-visible:outline-none">
-      <div className="relative aspect-[4/5] w-full overflow-hidden border border-line bg-gradient-to-b from-surface to-surface-2">
+      <div className="relative aspect-[4/5] w-full overflow-hidden border border-line bg-gradient-to-b from-[#1a1210] to-[#100b09]">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
