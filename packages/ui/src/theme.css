@@ -1,43 +1,16 @@
 /*
- * Arts & Handicrafts — central design tokens (Tailwind v4 `@theme`).
+ * Arts & Handicrafts — DEFAULT theme bundle (base + admin palette).
  *
- * This is the SINGLE SOURCE OF TRUTH for the brand's design tokens, consumed by
- * every app so a change here propagates everywhere. Import it right after
- * Tailwind in an app's entry stylesheet:
+ * Convenience import for the seller portal so a single `@import '@arts/ui/theme.css'`
+ * yields the shared base tokens plus the admin (near-black + gold) palette.
  *
- *   @import 'tailwindcss';
- *   @import '@arts/ui/theme.css';
+ * The public storefront instead composes the base with the heritage palette:
+ *   @import '@arts/ui/theme-base.css';
+ *   @import '@arts/ui/theme-heritage.css';
  *
- * The same values are mirrored as typed constants in `tokens.ts` for
- * programmatic use (inline styles, charts, canvas, etc.).
+ * All palettes declare the SAME token names, so shared components are never
+ * forked per theme — only token values change (see `themes.ts` for the typed
+ * equivalents).
  */
-@theme {
-  /* Surfaces */
-  --color-bg: #0a0a0b;
-  --color-surface: #16120b;
-  --color-surface-2: #1e180f;
-  --color-elevated: #271f13;
-
-  /* Gold accent scale */
-  --color-gold-300: #f6de8b;
-  --color-gold-400: #f2ce5b;
-  --color-gold-500: #e3b23c;
-  --color-gold-600: #c8901f;
-  --color-gold-700: #9c6f16;
-
-  /* Text */
-  --color-fg: #edeae3;
-  --color-muted: #a9a29a;
-  --color-faint: #6e675e;
-
-  /* Lines & states */
-  --color-line: rgba(227, 178, 60, 0.16);
-  --color-line-strong: rgba(227, 178, 60, 0.32);
-  --color-danger: #e5484d;
-  --color-success: #43b581;
-
-  /* Typography */
-  --font-display: 'Cinzel', ui-serif, serif;
-  --font-serif: 'Cormorant Garamond', ui-serif, serif;
-  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
-}
+@import './theme-base.css';
+@import './theme-admin.css';

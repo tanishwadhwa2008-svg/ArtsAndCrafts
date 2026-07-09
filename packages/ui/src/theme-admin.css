@@ -1,0 +1,33 @@
+/*
+ * Arts & Handicrafts — ADMIN palette (seller portal).
+ *
+ * Cool near-black canvas with molten-gold accents. Palette layer only: it
+ * overrides colour tokens on top of `theme-base.css`. Token NAMES are shared
+ * with every other palette so components never need to change per theme —
+ * only the values differ.
+ */
+@theme {
+  /* Surfaces */
+  --color-bg: #0a0a0b;
+  --color-surface: #16120b;
+  --color-surface-2: #1e180f;
+  --color-elevated: #271f13;
+
+  /* Gold accent scale */
+  --color-gold-300: #f6de8b;
+  --color-gold-400: #f2ce5b;
+  --color-gold-500: #e3b23c;
+  --color-gold-600: #c8901f;
+  --color-gold-700: #9c6f16;
+
+  /* Text */
+  --color-fg: #edeae3;
+  --color-muted: #a9a29a;
+  --color-faint: #6e675e;
+
+  /* Lines & states */
+  --color-line: rgba(227, 178, 60, 0.16);
+  --color-line-strong: rgba(227, 178, 60, 0.32);
+  --color-danger: #e5484d;
+  --color-success: #43b581;
+}

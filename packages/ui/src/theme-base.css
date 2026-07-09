@@ -1,0 +1,19 @@
+/*
+ * Arts & Handicrafts — BASE design tokens (Tailwind v4 `@theme`).
+ *
+ * Theme-agnostic tokens shared by every palette (typography, and any future
+ * spacing/radii/motion tokens). Palette layers (`theme-admin.css`,
+ * `theme-heritage.css`) supply the colour values on top of this.
+ *
+ * Apps import a base + one palette, e.g.:
+ *   @import 'tailwindcss';
+ *   @import '@arts/ui/theme-base.css';
+ *   @import '@arts/ui/theme-heritage.css';
+ *
+ * (The convenience bundle `@arts/ui/theme.css` = base + admin.)
+ */
+@theme {
+  --font-display: 'Cinzel', ui-serif, serif;
+  --font-serif: 'Cormorant Garamond', ui-serif, serif;
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+}

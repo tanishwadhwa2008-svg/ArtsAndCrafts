@@ -1,0 +1,39 @@
+/*
+ * Arts & Handicrafts — HERITAGE palette (public storefront).
+ *
+ * Warm espresso/walnut canvas with aged-gold accents — a richer, more
+ * artisanal register than the seller portal's cooler near-black. Palette layer
+ * only: it overrides the SAME colour token names as `theme-admin.css` (and
+ * keeps the same light-on-dark polarity), so shared components render correctly
+ * with zero component changes.
+ *
+ * Usage (e.g. in the storefront):
+ *   @import 'tailwindcss';
+ *   @import '@arts/ui/theme-base.css';
+ *   @import '@arts/ui/theme-heritage.css';
+ */
+@theme {
+  /* Surfaces — deep warm espresso */
+  --color-bg: #17110a;
+  --color-surface: #1f1710;
+  --color-surface-2: #2a2016;
+  --color-elevated: #34281a;
+
+  /* Aged-gold accent scale */
+  --color-gold-300: #ecd49a;
+  --color-gold-400: #dcbb6f;
+  --color-gold-500: #c99f4a;
+  --color-gold-600: #ab7f30;
+  --color-gold-700: #866221;
+
+  /* Text — warm ivory */
+  --color-fg: #f1eadd;
+  --color-muted: #b6a893;
+  --color-faint: #82735f;
+
+  /* Lines & states */
+  --color-line: rgba(201, 159, 74, 0.18);
+  --color-line-strong: rgba(201, 159, 74, 0.35);
+  --color-danger: #d9534f;
+  --color-success: #4c9a6a;
+}

@@ -6,6 +6,7 @@
  * exported separately as `@arts/ui/theme.css`.
  */
 export * from './tokens.js';
+export * from './themes.js';
 export * from './lib/cn.js';
 
 export * from './components/ui/badge.js';
