@@ -53,7 +53,10 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="relative isolate overflow-hidden">
+      {/* Pulled up under the sticky header (-mt-16 + matching pt-16) so the
+          rotating mandala sits behind the translucent nav without shifting the
+          hero content. */}
+      <section className="relative isolate -mt-16 overflow-hidden pt-16">
         {/* Silk grain + warm gold sheen behind the frame. */}
         <div
           aria-hidden="true"
@@ -63,8 +66,22 @@ export default async function HomePage() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(72%_60%_at_50%_-10%,rgba(201,159,74,0.14),transparent_70%)]"
         />
-        {/* Paisley watermark, top-right. */}
-        <Paisley className="pointer-events-none absolute -right-12 -top-10 -z-10 h-80 w-80 text-gold-500/[0.06] sm:h-[26rem] sm:w-[26rem]" />
+        {/* Rotating golden-ratio sacred-geometry mandala (oversized + centred so
+            the spin never exposes empty corners; clipped by the hero). */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[150vmax] w-[150vmax] -translate-x-1/2 -translate-y-1/2"
+        >
+          <div
+            className="h-full w-full opacity-[0.08] animate-[slowRotate_90s_linear_infinite]"
+            style={{
+              backgroundImage: "url('/patterns/sacred-geometry.svg')",
+              backgroundSize: '480px',
+              backgroundRepeat: 'repeat',
+              backgroundPosition: 'center',
+            }}
+          />
+        </div>
 
         <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
           <OrnateFrame className="flex flex-col items-center px-6 py-16 text-center sm:px-12 sm:py-20">

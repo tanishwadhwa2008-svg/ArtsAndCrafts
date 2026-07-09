@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <!--
+    Seamless golden-ratio sacred-geometry tile.
+    - Corner circles (r = tile) form an overlapping-circles lattice that tiles
+      without seams (every circle sits on a period-120 lattice node).
+    - Concentric rings at each cell centre step down by the golden ratio (phi):
+      120/phi, 120/phi^2, 120/phi^3, 120/phi^4.
+    Rendered faint + gold; rotated slowly behind the hero.
+  -->
+  <g fill="none" stroke="#c99f4a" stroke-width="0.6">
+    <circle cx="0" cy="0" r="120" />
+    <circle cx="120" cy="0" r="120" />
+    <circle cx="0" cy="120" r="120" />
+    <circle cx="120" cy="120" r="120" />
+    <circle cx="60" cy="60" r="74.16" />
+    <circle cx="60" cy="60" r="45.83" />
+    <circle cx="60" cy="60" r="28.33" />
+    <circle cx="60" cy="60" r="17.51" />
+  </g>
+  <g fill="#c99f4a">
+    <circle cx="60" cy="60" r="1.6" />
+    <circle cx="0" cy="0" r="1.4" />
+    <circle cx="120" cy="0" r="1.4" />
+    <circle cx="0" cy="120" r="1.4" />
+    <circle cx="120" cy="120" r="1.4" />
+  </g>
+</svg>
