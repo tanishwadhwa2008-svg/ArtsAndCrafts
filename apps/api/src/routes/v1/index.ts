@@ -8,6 +8,7 @@ import { contentRouter } from '../../modules/content/pages/pages.routes.js';
 import { inventoryRouter } from '../../modules/inventory/inventory.routes.js';
 import { mediaRouter } from '../../modules/media/media.routes.js';
 import { analyticsRouter } from '../../modules/analytics/analytics.routes.js';
+import { settingsRouter } from '../../modules/settings/settings.routes.js';
 import { publicRouter } from '../../modules/public/public.routes.js';
 
 /**
@@ -37,3 +38,4 @@ v1Router.use('/content', contentRouter);
 v1Router.use('/inventory', inventoryRouter);
 v1Router.use('/media', mediaRouter);
 v1Router.use('/analytics', analyticsRouter);
+v1Router.use('/settings', settingsRouter);

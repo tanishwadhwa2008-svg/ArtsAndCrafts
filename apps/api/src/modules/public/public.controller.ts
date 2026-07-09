@@ -4,10 +4,12 @@ import * as publicService from './public.service.js';
 import {
   serializePublicCollectionCard,
   serializePublicCollectionDetail,
+  serializePublicContact,
   serializePublicProductCard,
   serializePublicProductDetail,
   type PublicCollectionCardDto,
   type PublicCollectionDetailDto,
+  type PublicContactDto,
   type PublicProductCardDto,
   type PublicProductDetailDto,
 } from './public.serializer.js';
@@ -67,6 +69,16 @@ export async function collectionBySlugHandler(req: Request, res: Response): Prom
   const body: ApiSuccess<PublicCollectionDetailDto> = {
     ok: true,
     data: serializePublicCollectionDetail(collection),
+  };
+  res.json(body);
+}
+
+export async function contactHandler(_req: Request, res: Response): Promise<void> {
+  const shopId = await publicService.resolvePublicShopId();
+  const contact = await publicService.getPublicContact(shopId);
+  const body: ApiSuccess<PublicContactDto> = {
+    ok: true,
+    data: serializePublicContact(contact),
   };
   res.json(body);
 }

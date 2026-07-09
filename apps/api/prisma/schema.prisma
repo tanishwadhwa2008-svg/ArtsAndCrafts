@@ -523,6 +523,7 @@ model StorefrontSettings {
   homepage        Json?
   social          Json?
   footer          Json?
+  contact         Json?
   defaultCurrency String   @default("USD")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

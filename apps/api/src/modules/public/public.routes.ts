@@ -38,3 +38,5 @@ publicRouter.get(
   validate({ params: slugParamsSchema }),
   asyncHandler(controller.collectionBySlugHandler),
 );
+
+publicRouter.get('/contact', asyncHandler(controller.contactHandler));

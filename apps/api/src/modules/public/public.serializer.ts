@@ -128,3 +128,28 @@ export function serializePublicCollectionDetail(
     products: collection.products.map((cp) => serializePublicProductCard(cp.product)),
   };
 }
+
+export interface PublicContactDto {
+  phone: string | null;
+  email: string | null;
+  location: string | null;
+}
+
+/** Returns an enabled field's trimmed value, or null. Disabled values never leak. */
+function enabledContactValue(field: unknown): string | null {
+  if (typeof field !== 'object' || field === null) return null;
+  const f = field as { enabled?: unknown; value?: unknown };
+  if (f.enabled === true && typeof f.value === 'string' && f.value.trim().length > 0) {
+    return f.value.trim();
+  }
+  return null;
+}
+
+export function serializePublicContact(contact: unknown): PublicContactDto {
+  const c = (contact && typeof contact === 'object' ? contact : {}) as Record<string, unknown>;
+  return {
+    phone: enabledContactValue(c.phone),
+    email: enabledContactValue(c.email),
+    location: enabledContactValue(c.location),
+  };
+}

@@ -149,3 +149,12 @@ export async function getPublicHome(shopId: string): Promise<{
   ]);
   return { collections, products };
 }
+
+/** Raw stored contact JSON for the shop (null when settings were never configured). */
+export async function getPublicContact(shopId: string): Promise<unknown> {
+  const settings = await prisma.storefrontSettings.findUnique({
+    where: { shopId },
+    select: { contact: true },
+  });
+  return settings?.contact ?? null;
+}
