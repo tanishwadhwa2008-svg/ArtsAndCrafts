@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useCallback, useContext, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from './dialog.js';
