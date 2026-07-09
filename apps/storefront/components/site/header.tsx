@@ -5,7 +5,7 @@ import { MobileMenu } from './mobile-menu';
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg/70 backdrop-blur-md">
+    <header className="sticky top-0 z-40 bg-bg/70 backdrop-blur-md">
       <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:px-6 lg:px-10 xl:px-14">
         <div className="flex items-center gap-2 justify-self-start">
           <MobileMenu />

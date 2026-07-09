@@ -2,8 +2,7 @@ import Link from 'next/link';
 import { BadgeCheck, Globe, Handshake } from 'lucide-react';
 import { Button } from '@arts/ui';
 import { getHomeFeed } from '@/lib/storefront';
-import { ProductCard } from '@/components/shop/product-card';
-import { CollectionCard } from '@/components/shop/collection-card';
+import { CollectionCarousel } from '@/components/shop/collection-carousel';
 import { OrnateFrame, Paisley } from '@/components/site/ornaments';
 
 // Always render against the current catalogue (in sync with inventory/images).
@@ -49,7 +48,6 @@ const artisanPromises = [
 export default async function HomePage() {
   const feed = await getHomeFeed();
   const collections = feed?.collections ?? [];
-  const products = feed?.products ?? [];
 
   return (
     <>
@@ -134,38 +132,14 @@ export default async function HomePage() {
       </section>
 
       {collections.length > 0 ? (
-        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mb-10 flex items-end justify-between gap-4">
-            <div>
-              <p className="eyebrow">Curated by craft</p>
-              <h2 className="mt-2 font-display text-3xl text-gold-300">Collections</h2>
-            </div>
-            <Link
-              href="/collections"
-              className="shrink-0 text-xs uppercase tracking-[0.18em] text-muted transition-colors hover:text-gold-300"
-            >
-              View all
-            </Link>
+        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mb-10 text-center">
+            <p className="eyebrow">Curated by craft</p>
+            <h2 className="mt-2 font-display text-3xl text-gold-300 sm:text-4xl">
+              Featured collections
+            </h2>
           </div>
-          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {collections.map((collection) => (
-              <CollectionCard key={collection.id} collection={collection} />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {products.length > 0 ? (
-        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mb-10">
-            <p className="eyebrow">The latest</p>
-            <h2 className="mt-2 font-display text-3xl text-gold-300">New arrivals</h2>
-          </div>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <CollectionCarousel collections={collections} />
         </section>
       ) : null}
 
