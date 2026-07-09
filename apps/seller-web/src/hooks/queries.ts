@@ -8,6 +8,7 @@ import {
 } from '../api/catalog.js';
 import { getAnalyticsSummary } from '../api/analytics.js';
 import { getCollection, listCollections, type CollectionListParams } from '../api/collections.js';
+import { getHome } from '../api/content.js';
 
 export function useProducts(params: ProductListParams) {
   return useQuery({
@@ -55,4 +56,8 @@ export function useCollection(id: string | undefined) {
     queryFn: () => getCollection(id!),
     enabled: Boolean(id),
   });
+}
+
+export function useHomePage() {
+  return useQuery({ queryKey: ['content', 'home'], queryFn: getHome });
 }

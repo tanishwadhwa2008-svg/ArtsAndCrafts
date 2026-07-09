@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as api from '../api/catalog.js';
 import * as collectionsApi from '../api/collections.js';
+import * as contentApi from '../api/content.js';
 
 /** Invalidates the queries affected by catalog/inventory mutations. */
 function useInvalidators() {
@@ -12,6 +13,7 @@ function useInvalidators() {
     inventory: () => qc.invalidateQueries({ queryKey: ['inventory'] }),
     collections: () => qc.invalidateQueries({ queryKey: ['collections'] }),
     collection: (id: string) => qc.invalidateQueries({ queryKey: ['collection', id] }),
+    home: () => qc.invalidateQueries({ queryKey: ['content', 'home'] }),
   };
 }
 
@@ -193,5 +195,50 @@ export function useSetCollectionProducts(collectionId: string) {
       inv.collections();
       inv.collection(collectionId);
     },
+  });
+}
+
+// --- Homepage / content blocks ---
+
+export function useUpdateHomePage() {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: (args: { id: string; body: Parameters<typeof contentApi.updateContentPage>[1] }) =>
+      contentApi.updateContentPage(args.id, args.body),
+    onSuccess: () => inv.home(),
+  });
+}
+
+export function useAddBlock(pageId: string) {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: (body: Parameters<typeof contentApi.addBlock>[1]) =>
+      contentApi.addBlock(pageId, body),
+    onSuccess: () => inv.home(),
+  });
+}
+
+export function useUpdateBlock(pageId: string) {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: (args: { blockId: string; body: Parameters<typeof contentApi.updateBlock>[2] }) =>
+      contentApi.updateBlock(pageId, args.blockId, args.body),
+    onSuccess: () => inv.home(),
+  });
+}
+
+export function useDeleteBlock(pageId: string) {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: (blockId: string) => contentApi.deleteBlock(pageId, blockId),
+    onSuccess: () => inv.home(),
+  });
+}
+
+export function useReorderBlocks(pageId: string) {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: (blockIds: string[]) => contentApi.reorderBlocks(pageId, blockIds),
+    onSuccess: () => inv.home(),
   });
 }

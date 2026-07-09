@@ -1,5 +1,15 @@
 import { NavLink } from 'react-router-dom';
-import { Boxes, FolderTree, Gem, Layers, LayoutDashboard, Package, Settings, X } from 'lucide-react';
+import {
+  Boxes,
+  FolderTree,
+  Gem,
+  Layers,
+  LayoutDashboard,
+  LayoutTemplate,
+  Package,
+  Settings,
+  X,
+} from 'lucide-react';
 import { cn } from '../../lib/cn.js';
 
 const NAV = [
@@ -7,6 +17,7 @@ const NAV = [
   { to: '/products', label: 'Products', icon: Package },
   { to: '/categories', label: 'Categories', icon: FolderTree },
   { to: '/collections', label: 'Collections', icon: Layers },
+  { to: '/homepage', label: 'Homepage', icon: LayoutTemplate },
   { to: '/inventory', label: 'Inventory', icon: Boxes },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];
