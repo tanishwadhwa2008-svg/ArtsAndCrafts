@@ -20,8 +20,10 @@ import './globals.css';
 import { AnnouncementBar } from '@/components/site/announcement-bar';
 import { Footer } from '@/components/site/footer';
 import { Header } from '@/components/site/header';
+import { env } from '@/lib/env';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(env.siteUrl),
   title: {
     default: 'Arts and Crafts of India — Handcrafted Heritage',
     template: '%s · Arts and Crafts of India',

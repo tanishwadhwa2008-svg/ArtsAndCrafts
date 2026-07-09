@@ -12,4 +12,11 @@ export default [
       'react-refresh/only-export-components': 'off',
     },
   },
+  {
+    // Node-executed config files (next.config.mjs, postcss.config.mjs).
+    files: ['**/*.mjs'],
+    languageOptions: {
+      globals: { process: 'readonly', URL: 'readonly' },
+    },
+  },
 ];
