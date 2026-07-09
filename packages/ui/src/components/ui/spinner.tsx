@@ -7,8 +7,12 @@ export function Spinner({ className }: { className?: string }) {
 
 export function FullPageSpinner() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg">
-      <Loader2 className="h-8 w-8 animate-spin text-gold-500" aria-label="Loading" />
+    <div
+      role="status"
+      aria-label="Loading"
+      className="flex min-h-screen items-center justify-center bg-bg"
+    >
+      <Loader2 className="h-8 w-8 animate-spin text-gold-500" aria-hidden />
     </div>
   );
 }

@@ -14,6 +14,11 @@ const buttonVariants = cva(
           'border border-line-strong bg-transparent text-gold-400 hover:bg-gold-500/10 hover:border-gold-500',
         ghost: 'text-muted hover:bg-white/5 hover:text-fg',
         danger: 'bg-danger/90 text-white hover:bg-danger',
+        // Storefront (customer-facing) premium CTA: hairline outline, uppercase,
+        // wide letter-spacing, no radius, understated hover fill. Deliberately
+        // restrained (gallery/fashion e-commerce) vs the admin gradient button.
+        luxury:
+          'rounded-none border border-gold-600/70 bg-transparent px-7 text-[0.72rem] font-normal uppercase tracking-[0.2em] text-gold-300 transition-colors hover:border-gold-400 hover:bg-gold-500/10 hover:text-gold-100',
       },
       size: {
         sm: 'h-8 px-3 text-sm',

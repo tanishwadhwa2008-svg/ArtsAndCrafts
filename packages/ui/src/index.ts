@@ -11,6 +11,7 @@ export * from './lib/cn.js';
 
 export * from './components/ui/badge.js';
 export * from './components/ui/bar-chart.js';
+export * from './components/ui/bloom-loader.js';
 export * from './components/ui/button.js';
 export * from './components/ui/card.js';
 export * from './components/ui/confirm.js';
