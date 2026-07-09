@@ -6,6 +6,8 @@ import { DashboardPage } from './pages/DashboardPage.js';
 import { ProductsPage } from './pages/ProductsPage.js';
 import { ProductFormPage } from './pages/products/ProductFormPage.js';
 import { CategoriesPage } from './pages/CategoriesPage.js';
+import { CollectionsPage } from './pages/CollectionsPage.js';
+import { CollectionFormPage } from './pages/collections/CollectionFormPage.js';
 import { InventoryPage } from './pages/InventoryPage.js';
 import { SettingsPage } from './pages/SettingsPage.js';
 
@@ -28,6 +30,9 @@ export default function App() {
           <Route path="products/new" element={<ProductFormPage />} />
           <Route path="products/:id/edit" element={<ProductFormPage />} />
           <Route path="categories" element={<CategoriesPage />} />
+          <Route path="collections" element={<CollectionsPage />} />
+          <Route path="collections/new" element={<CollectionFormPage />} />
+          <Route path="collections/:id/edit" element={<CollectionFormPage />} />
           <Route path="inventory" element={<InventoryPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as api from '../api/catalog.js';
+import * as collectionsApi from '../api/collections.js';
 
 /** Invalidates the queries affected by catalog/inventory mutations. */
 function useInvalidators() {
@@ -9,6 +10,8 @@ function useInvalidators() {
     product: (id: string) => qc.invalidateQueries({ queryKey: ['product', id] }),
     categories: () => qc.invalidateQueries({ queryKey: ['categories'] }),
     inventory: () => qc.invalidateQueries({ queryKey: ['inventory'] }),
+    collections: () => qc.invalidateQueries({ queryKey: ['collections'] }),
+    collection: (id: string) => qc.invalidateQueries({ queryKey: ['collection', id] }),
   };
 }
 
@@ -148,5 +151,47 @@ export function useAdjustInventory() {
     mutationFn: (args: { variantId: string; body: Parameters<typeof api.adjustInventory>[1] }) =>
       api.adjustInventory(args.variantId, args.body),
     onSuccess: () => inv.inventory(),
+  });
+}
+
+// --- Collections ---
+
+export function useCreateCollection() {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: collectionsApi.createCollection,
+    onSuccess: () => inv.collections(),
+  });
+}
+
+export function useUpdateCollection() {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: (args: { id: string; body: Parameters<typeof collectionsApi.updateCollection>[1] }) =>
+      collectionsApi.updateCollection(args.id, args.body),
+    onSuccess: (_data, args) => {
+      inv.collections();
+      inv.collection(args.id);
+    },
+  });
+}
+
+export function useDeleteCollection() {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: collectionsApi.deleteCollection,
+    onSuccess: () => inv.collections(),
+  });
+}
+
+export function useSetCollectionProducts(collectionId: string) {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: (productIds: string[]) =>
+      collectionsApi.setCollectionProducts(collectionId, productIds),
+    onSuccess: () => {
+      inv.collections();
+      inv.collection(collectionId);
+    },
   });
 }
