@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as api from '../api/catalog.js';
 import * as collectionsApi from '../api/collections.js';
 import * as contentApi from '../api/content.js';
+import * as settingsApi from '../api/settings.js';
 
 /** Invalidates the queries affected by catalog/inventory mutations. */
 function useInvalidators() {
@@ -16,7 +17,18 @@ function useInvalidators() {
     home: () => qc.invalidateQueries({ queryKey: ['content', 'home'] }),
     contentPages: () => qc.invalidateQueries({ queryKey: ['content', 'pages'] }),
     contentPage: (id: string) => qc.invalidateQueries({ queryKey: ['content', 'page', id] }),
+    settings: () => qc.invalidateQueries({ queryKey: ['settings'] }),
   };
+}
+
+// --- Storefront settings ---
+
+export function useUpdateSettings() {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: settingsApi.updateSettings,
+    onSuccess: () => inv.settings(),
+  });
 }
 
 // --- Categories ---

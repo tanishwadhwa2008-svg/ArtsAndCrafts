@@ -9,6 +9,7 @@ import {
 import { getAnalyticsSummary } from '../api/analytics.js';
 import { getCollection, listCollections, type CollectionListParams } from '../api/collections.js';
 import { getContentPage, getHome, listContentPages } from '../api/content.js';
+import { getSettings } from '../api/settings.js';
 
 export function useProducts(params: ProductListParams) {
   return useQuery({
@@ -75,4 +76,8 @@ export function useContentPage(id: string | undefined) {
     queryFn: () => getContentPage(id!),
     enabled: Boolean(id),
   });
+}
+
+export function useSettings() {
+  return useQuery({ queryKey: ['settings'], queryFn: getSettings });
 }

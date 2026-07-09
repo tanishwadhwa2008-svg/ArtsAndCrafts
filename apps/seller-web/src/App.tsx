@@ -13,6 +13,7 @@ import { PagesPage } from './pages/PagesPage.js';
 import { PageEditorPage } from './pages/content/PageEditorPage.js';
 import { InventoryPage } from './pages/InventoryPage.js';
 import { SettingsPage } from './pages/SettingsPage.js';
+import { ContactSettingsPage } from './pages/ContactSettingsPage.js';
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="pages/new" element={<PageEditorPage />} />
           <Route path="pages/:id/edit" element={<PageEditorPage />} />
           <Route path="inventory" element={<InventoryPage />} />
+          <Route path="contact" element={<ContactSettingsPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Route>

@@ -1,12 +1,11 @@
 import { NavLink } from 'react-router-dom';
 import {
   Boxes,
-  FileText,
+  Contact,
   FolderTree,
   Gem,
   Layers,
   LayoutDashboard,
-  LayoutTemplate,
   Package,
   Settings,
   X,
@@ -18,8 +17,10 @@ const NAV = [
   { to: '/products', label: 'Products', icon: Package },
   { to: '/categories', label: 'Categories', icon: FolderTree },
   { to: '/collections', label: 'Collections', icon: Layers },
-  { to: '/homepage', label: 'Homepage', icon: LayoutTemplate },
-  { to: '/pages', label: 'Pages', icon: FileText },
+  { to: '/contact', label: 'Contact', icon: Contact },
+  // Homepage and Pages (block CMS) are intentionally hidden for now. Their
+  // routes and components remain in App.tsx so the feature can be re-enabled
+  // later by restoring these two nav entries.
   { to: '/inventory', label: 'Inventory', icon: Boxes },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];

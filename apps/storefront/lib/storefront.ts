@@ -54,6 +54,12 @@ export interface HomeFeed {
   products: ProductCard[];
 }
 
+export interface ContactInfo {
+  phone: string | null;
+  email: string | null;
+  location: string | null;
+}
+
 async function getJson<T>(path: string): Promise<T | null> {
   try {
     const res = await fetch(`${env.apiBaseUrl}/public${path}`, { cache: 'no-store' });
@@ -89,4 +95,8 @@ export function getCollections(): Promise<CollectionCard[] | null> {
 
 export function getCollection(slug: string): Promise<CollectionDetail | null> {
   return getJson<CollectionDetail>(`/collections/${encodeURIComponent(slug)}`);
+}
+
+export function getContact(): Promise<ContactInfo | null> {
+  return getJson<ContactInfo>('/contact');
 }
