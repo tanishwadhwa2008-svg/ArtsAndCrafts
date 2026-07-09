@@ -3,6 +3,7 @@ import type { ApiSuccess } from '@arts/shared';
 import { authRouter } from '../../modules/auth/auth.routes.js';
 import { categoriesRouter } from '../../modules/catalog/categories/categories.routes.js';
 import { productsRouter } from '../../modules/catalog/products/products.routes.js';
+import { collectionsRouter } from '../../modules/content/collections/collections.routes.js';
 import { inventoryRouter } from '../../modules/inventory/inventory.routes.js';
 import { mediaRouter } from '../../modules/media/media.routes.js';
 import { analyticsRouter } from '../../modules/analytics/analytics.routes.js';
@@ -27,6 +28,7 @@ v1Router.get('/', (_req, res) => {
 v1Router.use('/auth', authRouter);
 v1Router.use('/categories', categoriesRouter);
 v1Router.use('/products', productsRouter);
+v1Router.use('/collections', collectionsRouter);
 v1Router.use('/inventory', inventoryRouter);
 v1Router.use('/media', mediaRouter);
 v1Router.use('/analytics', analyticsRouter);
