@@ -1,4 +1,8 @@
-import type { ContentBlockInput, UpdateContentPageInput } from '@arts/shared';
+import type {
+  ContentBlockInput,
+  CreateContentPageInput,
+  UpdateContentPageInput,
+} from '@arts/shared';
 import { apiRequest } from '../lib/api.js';
 
 export interface ContentBlock {
@@ -24,8 +28,42 @@ export interface ContentPage {
   blocks: ContentBlock[];
 }
 
+export interface ContentPageListItem {
+  id: string;
+  title: string;
+  slug: string;
+  type: string;
+  status: 'DRAFT' | 'PUBLISHED';
+  blockCount: number;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export function getHome(): Promise<ContentPage> {
   return apiRequest<ContentPage>('/content/home');
+}
+
+export function listContentPages(
+  params: { type?: string; status?: string } = {},
+): Promise<ContentPageListItem[]> {
+  const q = new URLSearchParams();
+  if (params.type) q.set('type', params.type);
+  if (params.status) q.set('status', params.status);
+  const s = q.toString();
+  return apiRequest<ContentPageListItem[]>(`/content/pages${s ? `?${s}` : ''}`);
+}
+
+export function getContentPage(id: string): Promise<ContentPage> {
+  return apiRequest<ContentPage>(`/content/pages/${id}`);
+}
+
+export function createContentPage(body: CreateContentPageInput): Promise<ContentPage> {
+  return apiRequest<ContentPage>('/content/pages', { method: 'POST', body });
+}
+
+export function deleteContentPage(id: string): Promise<void> {
+  return apiRequest<void>(`/content/pages/${id}`, { method: 'DELETE' });
 }
 
 export function updateContentPage(id: string, body: UpdateContentPageInput): Promise<ContentPage> {

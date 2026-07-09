@@ -9,6 +9,8 @@ import { CategoriesPage } from './pages/CategoriesPage.js';
 import { CollectionsPage } from './pages/CollectionsPage.js';
 import { CollectionFormPage } from './pages/collections/CollectionFormPage.js';
 import { HomepagePage } from './pages/HomepagePage.js';
+import { PagesPage } from './pages/PagesPage.js';
+import { PageEditorPage } from './pages/content/PageEditorPage.js';
 import { InventoryPage } from './pages/InventoryPage.js';
 import { SettingsPage } from './pages/SettingsPage.js';
 
@@ -35,6 +37,9 @@ export default function App() {
           <Route path="collections/new" element={<CollectionFormPage />} />
           <Route path="collections/:id/edit" element={<CollectionFormPage />} />
           <Route path="homepage" element={<HomepagePage />} />
+          <Route path="pages" element={<PagesPage />} />
+          <Route path="pages/new" element={<PageEditorPage />} />
+          <Route path="pages/:id/edit" element={<PageEditorPage />} />
           <Route path="inventory" element={<InventoryPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>

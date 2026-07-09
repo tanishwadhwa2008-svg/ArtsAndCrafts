@@ -14,6 +14,8 @@ function useInvalidators() {
     collections: () => qc.invalidateQueries({ queryKey: ['collections'] }),
     collection: (id: string) => qc.invalidateQueries({ queryKey: ['collection', id] }),
     home: () => qc.invalidateQueries({ queryKey: ['content', 'home'] }),
+    contentPages: () => qc.invalidateQueries({ queryKey: ['content', 'pages'] }),
+    contentPage: (id: string) => qc.invalidateQueries({ queryKey: ['content', 'page', id] }),
   };
 }
 
@@ -198,14 +200,34 @@ export function useSetCollectionProducts(collectionId: string) {
   });
 }
 
-// --- Homepage / content blocks ---
+// --- Content pages / blocks ---
 
-export function useUpdateHomePage() {
+export function useCreateContentPage() {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: contentApi.createContentPage,
+    onSuccess: () => inv.contentPages(),
+  });
+}
+
+export function useUpdateContentPage() {
   const inv = useInvalidators();
   return useMutation({
     mutationFn: (args: { id: string; body: Parameters<typeof contentApi.updateContentPage>[1] }) =>
       contentApi.updateContentPage(args.id, args.body),
-    onSuccess: () => inv.home(),
+    onSuccess: (_data, args) => {
+      inv.home();
+      inv.contentPage(args.id);
+      inv.contentPages();
+    },
+  });
+}
+
+export function useDeleteContentPage() {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: contentApi.deleteContentPage,
+    onSuccess: () => inv.contentPages(),
   });
 }
 
@@ -214,7 +236,10 @@ export function useAddBlock(pageId: string) {
   return useMutation({
     mutationFn: (body: Parameters<typeof contentApi.addBlock>[1]) =>
       contentApi.addBlock(pageId, body),
-    onSuccess: () => inv.home(),
+    onSuccess: () => {
+      inv.home();
+      inv.contentPage(pageId);
+    },
   });
 }
 
@@ -223,7 +248,10 @@ export function useUpdateBlock(pageId: string) {
   return useMutation({
     mutationFn: (args: { blockId: string; body: Parameters<typeof contentApi.updateBlock>[2] }) =>
       contentApi.updateBlock(pageId, args.blockId, args.body),
-    onSuccess: () => inv.home(),
+    onSuccess: () => {
+      inv.home();
+      inv.contentPage(pageId);
+    },
   });
 }
 
@@ -231,7 +259,10 @@ export function useDeleteBlock(pageId: string) {
   const inv = useInvalidators();
   return useMutation({
     mutationFn: (blockId: string) => contentApi.deleteBlock(pageId, blockId),
-    onSuccess: () => inv.home(),
+    onSuccess: () => {
+      inv.home();
+      inv.contentPage(pageId);
+    },
   });
 }
 
@@ -239,6 +270,9 @@ export function useReorderBlocks(pageId: string) {
   const inv = useInvalidators();
   return useMutation({
     mutationFn: (blockIds: string[]) => contentApi.reorderBlocks(pageId, blockIds),
-    onSuccess: () => inv.home(),
+    onSuccess: () => {
+      inv.home();
+      inv.contentPage(pageId);
+    },
   });
 }

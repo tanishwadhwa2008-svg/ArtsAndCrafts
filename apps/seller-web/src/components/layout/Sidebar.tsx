@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   Boxes,
+  FileText,
   FolderTree,
   Gem,
   Layers,
@@ -18,6 +19,7 @@ const NAV = [
   { to: '/categories', label: 'Categories', icon: FolderTree },
   { to: '/collections', label: 'Collections', icon: Layers },
   { to: '/homepage', label: 'Homepage', icon: LayoutTemplate },
+  { to: '/pages', label: 'Pages', icon: FileText },
   { to: '/inventory', label: 'Inventory', icon: Boxes },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];

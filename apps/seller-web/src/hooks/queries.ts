@@ -8,7 +8,7 @@ import {
 } from '../api/catalog.js';
 import { getAnalyticsSummary } from '../api/analytics.js';
 import { getCollection, listCollections, type CollectionListParams } from '../api/collections.js';
-import { getHome } from '../api/content.js';
+import { getContentPage, getHome, listContentPages } from '../api/content.js';
 
 export function useProducts(params: ProductListParams) {
   return useQuery({
@@ -60,4 +60,19 @@ export function useCollection(id: string | undefined) {
 
 export function useHomePage() {
   return useQuery({ queryKey: ['content', 'home'], queryFn: getHome });
+}
+
+export function useContentPages(params: { type?: string; status?: string } = {}) {
+  return useQuery({
+    queryKey: ['content', 'pages', params],
+    queryFn: () => listContentPages(params),
+  });
+}
+
+export function useContentPage(id: string | undefined) {
+  return useQuery({
+    queryKey: ['content', 'page', id],
+    queryFn: () => getContentPage(id!),
+    enabled: Boolean(id),
+  });
 }
