@@ -1,34 +1,88 @@
 import Link from 'next/link';
-import { BloomLoader, Button } from '@arts/ui';
+import { Button } from '@arts/ui';
+import { getHomeFeed } from '@/lib/storefront';
+import { ProductCard } from '@/components/shop/product-card';
+import { CollectionCard } from '@/components/shop/collection-card';
 
-export default function HomePage() {
+// Always render against the current catalogue (in sync with inventory/images).
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage() {
+  const feed = await getHomeFeed();
+  const collections = feed?.collections ?? [];
+  const products = feed?.products ?? [];
+
   return (
-    <section className="mx-auto flex min-h-[68vh] max-w-4xl flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="eyebrow mb-5">Arts and Crafts of India</p>
+    <>
+      <section className="mx-auto flex min-h-[68vh] max-w-4xl flex-col items-center justify-center px-6 py-24 text-center">
+        <p className="eyebrow mb-5">Arts and Crafts of India</p>
 
-      <h1 className="font-display text-4xl leading-[1.1] text-gold-300 sm:text-6xl">
-        Handcrafted heritage,
-        <br />
-        curated for the world.
-      </h1>
+        <h1 className="font-display text-4xl leading-[1.1] text-gold-300 sm:text-6xl">
+          Handcrafted heritage,
+          <br />
+          curated for the world.
+        </h1>
 
-      <p className="mt-7 max-w-xl font-serif text-lg italic leading-relaxed text-muted sm:text-xl">
-        A living archive of master craftsmanship — every piece carrying the
-        story of its maker, its materials, and the tradition it belongs to.
-      </p>
+        <p className="mt-7 max-w-xl font-serif text-lg italic leading-relaxed text-muted sm:text-xl">
+          A living archive of master craftsmanship — every piece carrying the
+          story of its maker, its materials, and the tradition it belongs to.
+        </p>
 
-      <div className="mt-11">
-        <Button asChild variant="luxury" size="lg">
-          <Link href="/collections">Explore the collection</Link>
-        </Button>
-      </div>
+        <div className="mt-11">
+          <Button asChild variant="luxury" size="lg">
+            <Link href="/collections">Explore the collection</Link>
+          </Button>
+        </div>
+      </section>
 
-      <div className="mt-20 flex flex-col items-center gap-3">
-        <BloomLoader className="h-10 w-10 text-gold-500" label="Loading the atelier" />
-        <span className="text-xs uppercase tracking-[0.2em] text-faint">
-          Storefront · scaffold
-        </span>
-      </div>
-    </section>
+      {collections.length > 0 ? (
+        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mb-10 flex items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow">Curated by craft</p>
+              <h2 className="mt-2 font-display text-3xl text-gold-300">Collections</h2>
+            </div>
+            <Link
+              href="/collections"
+              className="shrink-0 text-xs uppercase tracking-[0.18em] text-muted transition-colors hover:text-gold-300"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {collections.map((collection) => (
+              <CollectionCard key={collection.id} collection={collection} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {products.length > 0 ? (
+        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <p className="eyebrow">The latest</p>
+            <h2 className="mt-2 font-display text-3xl text-gold-300">New arrivals</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section className="mx-auto max-w-3xl px-6 py-20 text-center">
+        <p className="eyebrow">Our heritage</p>
+        <p className="mt-5 font-serif text-2xl italic leading-relaxed text-gold-200 sm:text-3xl">
+          &ldquo;Every handmade object carries the memory of the hand that made
+          it.&rdquo;
+        </p>
+        <div className="mt-8">
+          <Button asChild variant="luxury">
+            <Link href="/about">Our story</Link>
+          </Button>
+        </div>
+      </section>
+    </>
   );
 }

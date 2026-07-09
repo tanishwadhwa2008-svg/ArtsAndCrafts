@@ -1,19 +1,14 @@
 import type { Metadata } from 'next';
+import { getCollections } from '@/lib/storefront';
 import { PageIntro } from '@/components/site/page-intro';
-import { PlaceholderTile } from '@/components/site/placeholder-tile';
+import { CollectionCard } from '@/components/shop/collection-card';
 
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Collections' };
 
-const collections = [
-  { slug: 'blue-pottery-of-jaipur', title: 'Blue Pottery of Jaipur', region: 'Rajasthan' },
-  { slug: 'pattachitra-scrolls', title: 'Pattachitra Scrolls', region: 'Odisha' },
-  { slug: 'pashmina-weaves', title: 'Pashmina Weaves', region: 'Kashmir' },
-  { slug: 'bidriware', title: 'Bidriware', region: 'Karnataka' },
-  { slug: 'dhokra-metalcraft', title: 'Dhokra Metalcraft', region: 'Chhattisgarh' },
-  { slug: 'madhubani-painting', title: 'Madhubani Painting', region: 'Bihar' },
-];
+export default async function CollectionsPage() {
+  const collections = await getCollections();
 
-export default function CollectionsPage() {
   return (
     <>
       <PageIntro
@@ -22,16 +17,17 @@ export default function CollectionsPage() {
         lede="Explore India's craft traditions, grouped by technique, region, and the hands that keep them alive."
       />
       <div className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-3">
-          {collections.map((collection) => (
-            <PlaceholderTile
-              key={collection.slug}
-              href={`/collections/${collection.slug}`}
-              eyebrow={collection.region}
-              title={collection.title}
-            />
-          ))}
-        </div>
+        {!collections || collections.length === 0 ? (
+          <p className="py-16 text-center text-muted">
+            Collections are being curated. Please check back soon.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {collections.map((collection) => (
+              <CollectionCard key={collection.id} collection={collection} />
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
