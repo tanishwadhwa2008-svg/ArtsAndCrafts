@@ -1,7 +1,3 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-/** Merge conditional class names, de-duplicating Tailwind utilities. */
-export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(inputs));
-}
+// The `cn` helper now lives in the central design system. This re-export keeps
+// the app's many `../lib/cn.js` imports working without churn.
+export { cn } from '@arts/ui';

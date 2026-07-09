@@ -1,6 +1,5 @@
 import { useAuth } from '../auth/AuthProvider.js';
-import { PageHeader } from '../components/ui/page-header.js';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card.js';
+import { Card, CardContent, CardHeader, CardTitle, PageHeader } from '@arts/ui';
 
 function Row({ label, value }: { label: string; value: string }) {
   return (

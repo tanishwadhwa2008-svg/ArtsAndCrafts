@@ -3,10 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Gem } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider.js';
 import { ApiError } from '../lib/api.js';
-import { Button } from '../components/ui/button.js';
-import { Input } from '../components/ui/input.js';
-import { Label } from '../components/ui/label.js';
-import { Spinner } from '../components/ui/spinner.js';
+import { Button, Input, Label, Spinner } from '@arts/ui';
 
 export function LoginPage() {
   const { login } = useAuth();

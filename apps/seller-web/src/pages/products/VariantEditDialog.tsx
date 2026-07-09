@@ -4,14 +4,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { updateVariantSchema, type UpdateVariantInput } from '@arts/shared';
 import type { Variant } from '../../api/catalog.js';
 import { useUpdateVariant } from '../../hooks/mutations.js';
-import { useToast } from '../../components/ui/toast.js';
 import { ApiError } from '../../lib/api.js';
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from '../../components/ui/dialog.js';
-import { Field } from '../../components/ui/form-field.js';
-import { Input } from '../../components/ui/input.js';
-import { Select } from '../../components/ui/select.js';
-import { Button } from '../../components/ui/button.js';
-import { Spinner } from '../../components/ui/spinner.js';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  Field,
+  Input,
+  Select,
+  Spinner,
+  useToast,
+} from '@arts/ui';
 
 export function VariantEditDialog({
   productId,
@@ -79,10 +84,7 @@ export function VariantEditDialog({
             />
           </Field>
           <Field label="Status" htmlFor="ve-active">
-            <Select
-              id="ve-active"
-              {...register('isActive', { setValueAs: (v) => v === 'true' })}
-            >
+            <Select id="ve-active" {...register('isActive', { setValueAs: (v) => v === 'true' })}>
               <option value="true">Active</option>
               <option value="false">Inactive</option>
             </Select>

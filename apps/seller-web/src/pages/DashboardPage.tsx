@@ -1,8 +1,5 @@
 import { AlertTriangle, Boxes, FolderTree, Layers, Package, Wallet } from 'lucide-react';
-import { PageHeader } from '../components/ui/page-header.js';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card.js';
-import { Spinner } from '../components/ui/spinner.js';
-import { BarChart } from '../components/ui/bar-chart.js';
+import { BarChart, Card, CardContent, CardHeader, CardTitle, PageHeader, Spinner } from '@arts/ui';
 import { useAnalyticsSummary } from '../hooks/queries.js';
 
 function StatCard({

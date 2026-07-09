@@ -4,15 +4,22 @@ import { ChevronLeft, ChevronRight, Pencil, Plus, Search, Trash2 } from 'lucide-
 import type { Product } from '../api/catalog.js';
 import { useProducts } from '../hooks/queries.js';
 import { useDeleteProduct } from '../hooks/mutations.js';
-import { useToast } from '../components/ui/toast.js';
-import { useConfirm } from '../components/ui/confirm.js';
 import { ApiError } from '../lib/api.js';
-import { PageHeader } from '../components/ui/page-header.js';
-import { Button } from '../components/ui/button.js';
-import { Input } from '../components/ui/input.js';
-import { Badge } from '../components/ui/badge.js';
-import { Spinner } from '../components/ui/spinner.js';
-import { Table, TBody, TD, TH, THead, TR } from '../components/ui/table.js';
+import {
+  Badge,
+  Button,
+  Input,
+  PageHeader,
+  Spinner,
+  Table,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+  useConfirm,
+  useToast,
+} from '@arts/ui';
 
 const PAGE_SIZE = 10;
 

@@ -1,6 +1,13 @@
 @import 'tailwindcss';
 @import '@arts/ui/theme.css';
 
+/*
+ * Tailwind ignores node_modules by default, so explicitly scan the shared
+ * design-system components for the utility classes they use — otherwise
+ * component-only classes (e.g. the spinner's animate-spin) get tree-shaken away.
+ */
+@source '../node_modules/@arts/ui/src';
+
 @layer base {
   html {
     color-scheme: dark;

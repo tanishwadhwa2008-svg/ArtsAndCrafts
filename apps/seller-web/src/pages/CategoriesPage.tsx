@@ -3,13 +3,20 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import type { Category } from '../api/catalog.js';
 import { useCategories } from '../hooks/queries.js';
 import { useDeleteCategory } from '../hooks/mutations.js';
-import { useToast } from '../components/ui/toast.js';
-import { useConfirm } from '../components/ui/confirm.js';
 import { ApiError } from '../lib/api.js';
-import { PageHeader } from '../components/ui/page-header.js';
-import { Button } from '../components/ui/button.js';
-import { Spinner } from '../components/ui/spinner.js';
-import { Table, TBody, TD, TH, THead, TR } from '../components/ui/table.js';
+import {
+  Button,
+  PageHeader,
+  Spinner,
+  Table,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+  useConfirm,
+  useToast,
+} from '@arts/ui';
 import { CategoryFormDialog } from './categories/CategoryFormDialog.js';
 
 export function CategoriesPage() {
@@ -38,8 +45,7 @@ export function CategoriesPage() {
     if (!ok) return;
     deleteMut.mutate(category.id, {
       onSuccess: () => toast.success('Category deleted.'),
-      onError: (e) =>
-        toast.error(e instanceof ApiError ? e.message : 'Failed to delete category.'),
+      onError: (e) => toast.error(e instanceof ApiError ? e.message : 'Failed to delete category.'),
     });
   };
 

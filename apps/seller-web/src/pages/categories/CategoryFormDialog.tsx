@@ -5,15 +5,20 @@ import { createCategorySchema, type CreateCategoryInput } from '@arts/shared';
 import type { Category } from '../../api/catalog.js';
 import { useCategories } from '../../hooks/queries.js';
 import { useCreateCategory, useUpdateCategory } from '../../hooks/mutations.js';
-import { useToast } from '../../components/ui/toast.js';
 import { ApiError } from '../../lib/api.js';
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from '../../components/ui/dialog.js';
-import { Field } from '../../components/ui/form-field.js';
-import { Input } from '../../components/ui/input.js';
-import { Select } from '../../components/ui/select.js';
-import { Textarea } from '../../components/ui/textarea.js';
-import { Button } from '../../components/ui/button.js';
-import { Spinner } from '../../components/ui/spinner.js';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  Field,
+  Input,
+  Select,
+  Spinner,
+  Textarea,
+  useToast,
+} from '@arts/ui';
 
 function slugify(value: string): string {
   return value

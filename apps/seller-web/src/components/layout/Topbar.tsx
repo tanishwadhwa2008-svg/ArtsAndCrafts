@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { LogOut, Menu, UserRound } from 'lucide-react';
 import { useAuth } from '../../auth/AuthProvider.js';
-import { Button } from '../ui/button.js';
+import { Button } from '@arts/ui';
 
 export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { user, logout } = useAuth();

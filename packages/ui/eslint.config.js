@@ -1,3 +1,3 @@
-import base from '@arts/config/eslint/node';
+import react from '@arts/config/eslint/react';
 
-export default base;
+export default react;

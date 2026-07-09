@@ -10,13 +10,18 @@ import {
   useSetPrimaryImage,
   useUpdateImage,
 } from '../../hooks/mutations.js';
-import { useToast } from '../../components/ui/toast.js';
-import { useConfirm } from '../../components/ui/confirm.js';
+import {
+  useToast,
+  useConfirm,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Spinner,
+} from '@arts/ui';
 import { ApiError } from '../../lib/api.js';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card.js';
-import { Button } from '../../components/ui/button.js';
-import { Badge } from '../../components/ui/badge.js';
-import { Spinner } from '../../components/ui/spinner.js';
 import { cn } from '../../lib/cn.js';
 
 export function ImagesSection({

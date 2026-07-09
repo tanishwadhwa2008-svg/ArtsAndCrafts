@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
 import type { InventoryItem } from '../api/catalog.js';
 import { useInventory } from '../hooks/queries.js';
-import { PageHeader } from '../components/ui/page-header.js';
-import { Button } from '../components/ui/button.js';
-import { Badge } from '../components/ui/badge.js';
-import { Spinner } from '../components/ui/spinner.js';
-import { Table, TBody, TD, TH, THead, TR } from '../components/ui/table.js';
+import { Badge, Button, PageHeader, Spinner, Table, TBody, TD, TH, THead, TR } from '@arts/ui';
 import { InventoryAdjustDialog } from './inventory/InventoryAdjustDialog.js';
 
 const PAGE_SIZE = 10;

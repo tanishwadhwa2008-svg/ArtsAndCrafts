@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider.js';
-import { FullPageSpinner } from '../components/ui/spinner.js';
+import { FullPageSpinner } from '@arts/ui';
 
 /** Gates protected routes behind an authenticated session. */
 export function RequireAuth() {

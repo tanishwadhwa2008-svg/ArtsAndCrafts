@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import type { InventoryItem } from '../../api/catalog.js';
 import { useAdjustInventory } from '../../hooks/mutations.js';
-import { useToast } from '../../components/ui/toast.js';
 import { ApiError } from '../../lib/api.js';
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from '../../components/ui/dialog.js';
-import { Field } from '../../components/ui/form-field.js';
-import { Input } from '../../components/ui/input.js';
-import { Button } from '../../components/ui/button.js';
-import { Spinner } from '../../components/ui/spinner.js';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  Field,
+  Input,
+  Spinner,
+  useToast,
+} from '@arts/ui';
 
 export function InventoryAdjustDialog({
   item,

@@ -6,16 +6,19 @@ import { ArrowLeft } from 'lucide-react';
 import { SUPPORTED_CURRENCIES, createProductSchema, type CreateProductInput } from '@arts/shared';
 import { useCategories, useProduct } from '../../hooks/queries.js';
 import { useCreateProduct, useUpdateProduct } from '../../hooks/mutations.js';
-import { useToast } from '../../components/ui/toast.js';
 import { ApiError } from '../../lib/api.js';
-import { PageHeader } from '../../components/ui/page-header.js';
-import { Card, CardContent } from '../../components/ui/card.js';
-import { Field } from '../../components/ui/form-field.js';
-import { Input } from '../../components/ui/input.js';
-import { Textarea } from '../../components/ui/textarea.js';
-import { Select } from '../../components/ui/select.js';
-import { Button } from '../../components/ui/button.js';
-import { Spinner } from '../../components/ui/spinner.js';
+import {
+  Button,
+  Card,
+  CardContent,
+  Field,
+  Input,
+  PageHeader,
+  Select,
+  Spinner,
+  Textarea,
+  useToast,
+} from '@arts/ui';
 import { VariantsSection } from './VariantsSection.js';
 import { ImagesSection } from './ImagesSection.js';
 

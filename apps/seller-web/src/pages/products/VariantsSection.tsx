@@ -5,16 +5,26 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { createVariantSchema, type CreateVariantInput } from '@arts/shared';
 import type { Variant } from '../../api/catalog.js';
 import { useAddVariant, useDeleteVariant } from '../../hooks/mutations.js';
-import { useToast } from '../../components/ui/toast.js';
-import { useConfirm } from '../../components/ui/confirm.js';
 import { ApiError } from '../../lib/api.js';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card.js';
-import { Field } from '../../components/ui/form-field.js';
-import { Input } from '../../components/ui/input.js';
-import { Button } from '../../components/ui/button.js';
-import { Badge } from '../../components/ui/badge.js';
-import { Spinner } from '../../components/ui/spinner.js';
-import { Table, TBody, TD, TH, THead, TR } from '../../components/ui/table.js';
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Field,
+  Input,
+  Spinner,
+  Table,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+  useConfirm,
+  useToast,
+} from '@arts/ui';
 import { VariantEditDialog } from './VariantEditDialog.js';
 
 export function VariantsSection({
