@@ -1,0 +1,44 @@
+/*
+ * Arts & Crafts of India — ROYAL WINE palette (public storefront).
+ *
+ * A deep oxblood / burgundy canvas with aged-gold accents — a regal,
+ * distinctly Indian-heritage register. Palette layer only: it overrides the
+ * SAME colour token names as `theme-admin.css` / `theme-heritage.css` (and
+ * keeps the same light-on-dark polarity), so shared components render with
+ * zero component changes.
+ *
+ * Readability guardrails: `--color-fg` / `--color-muted` are warm ivory so
+ * body copy stays legible on wine (gold is reserved for headings & accents).
+ * Product tiles use a neutral near-black surface (set in the storefront
+ * ProductCard) so photography reads true against the wine chrome.
+ *
+ * Usage (e.g. in the storefront):
+ *   @import 'tailwindcss';
+ *   @import '@arts/ui/theme-base.css';
+ *   @import '@arts/ui/theme-wine.css';
+ */
+@theme {
+  /* Surfaces — deep oxblood / burgundy */
+  --color-bg: #2a0a14;
+  --color-surface: #350f1b;
+  --color-surface-2: #421422;
+  --color-elevated: #4e1a2a;
+
+  /* Aged-gold accent scale */
+  --color-gold-300: #ecd49a;
+  --color-gold-400: #dcbb6f;
+  --color-gold-500: #c99f4a;
+  --color-gold-600: #ab7f30;
+  --color-gold-700: #866221;
+
+  /* Text — warm ivory (headings/accents go gold) */
+  --color-fg: #f5ecdd;
+  --color-muted: #d9c2b4;
+  --color-faint: #a98a82;
+
+  /* Lines & states (nudged to read on wine) */
+  --color-line: rgba(201, 159, 74, 0.26);
+  --color-line-strong: rgba(201, 159, 74, 0.45);
+  --color-danger: #e06a63;
+  --color-success: #6fbf8e;
+}

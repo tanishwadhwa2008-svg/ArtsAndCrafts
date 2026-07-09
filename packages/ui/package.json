@@ -18,7 +18,8 @@
     "./theme.css": "./src/theme.css",
     "./theme-base.css": "./src/theme-base.css",
     "./theme-admin.css": "./src/theme-admin.css",
-    "./theme-heritage.css": "./src/theme-heritage.css"
+    "./theme-heritage.css": "./src/theme-heritage.css",
+    "./theme-wine.css": "./src/theme-wine.css"
   },
   "sideEffects": [
     "**/*.css"
