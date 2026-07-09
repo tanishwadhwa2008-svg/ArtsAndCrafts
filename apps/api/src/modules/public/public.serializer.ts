@@ -102,7 +102,7 @@ export function serializePublicCollectionCard(
     title: collection.title,
     slug: collection.slug,
     description: collection.description,
-    coverUrl: collection.coverUrl,
+    coverUrl: collection.coverUrl ?? collection.products[0]?.product.images[0]?.url ?? null,
     productCount: collection._count.products,
   };
 }
@@ -124,7 +124,7 @@ export function serializePublicCollectionDetail(
     title: collection.title,
     slug: collection.slug,
     description: collection.description,
-    coverUrl: collection.coverUrl,
+    coverUrl: collection.coverUrl ?? collection.products[0]?.product.images[0]?.url ?? null,
     products: collection.products.map((cp) => serializePublicProductCard(cp.product)),
   };
 }

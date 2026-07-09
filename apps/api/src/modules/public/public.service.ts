@@ -31,6 +31,24 @@ export type PublicProductDetailRow = Prisma.ProductGetPayload<{ include: typeof 
 
 const collectionCardInclude = {
   _count: { select: { products: true } },
+  // First active member product's primary image — used as a cover fallback when
+  // the collection has no coverUrl of its own.
+  products: {
+    where: { product: { status: 'ACTIVE' as const, deletedAt: null } },
+    orderBy: { position: 'asc' as const },
+    take: 1,
+    include: {
+      product: {
+        select: {
+          images: {
+            orderBy: [{ isPrimary: 'desc' as const }, { position: 'asc' as const }],
+            take: 1,
+            select: { url: true },
+          },
+        },
+      },
+    },
+  },
 } satisfies Prisma.CollectionInclude;
 
 export type PublicCollectionCardRow = Prisma.CollectionGetPayload<{
