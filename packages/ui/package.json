@@ -1,0 +1,37 @@
+{
+  "name": "@arts/ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Central design system (tokens, primitives) shared across the Arts & Handicrafts apps.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./tokens": {
+      "types": "./dist/tokens.d.ts",
+      "default": "./dist/tokens.js"
+    },
+    "./theme.css": "./src/theme.css"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rimraf dist .turbo"
+  },
+  "devDependencies": {
+    "@arts/config": "workspace:*",
+    "@types/node": "^22.8.1",
+    "eslint": "^9.13.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.3"
+  }
+}

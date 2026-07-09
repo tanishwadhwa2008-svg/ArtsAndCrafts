@@ -117,6 +117,9 @@ importers:
       '@arts/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@arts/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@fontsource/cinzel':
         specifier: ^5.1.0
         version: 5.2.8
@@ -250,6 +253,24 @@ importers:
       zod:
         specifier: ^3.23.8
         version: 3.25.76
+    devDependencies:
+      '@arts/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^22.8.1
+        version: 22.20.0
+      eslint:
+        specifier: ^9.13.0
+        version: 9.39.4(jiti@2.7.0)
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+
+  packages/ui:
     devDependencies:
       '@arts/config':
         specifier: workspace:*

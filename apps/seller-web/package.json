@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@arts/shared": "workspace:*",
+    "@arts/ui": "workspace:*",
     "@fontsource/cinzel": "^5.1.0",
     "@fontsource/cormorant-garamond": "^5.1.0",
     "@fontsource/manrope": "^5.1.0",

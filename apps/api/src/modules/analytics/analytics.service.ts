@@ -12,7 +12,7 @@ interface CountRow {
   count: bigint | number | null;
 }
 
-function toNumber(value: bigint | number | null | undefined): number {
+function toNumber(value: string | bigint | number | null | undefined): number {
   return value == null ? 0 : Number(value);
 }
 
