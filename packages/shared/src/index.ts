@@ -16,3 +16,4 @@ export * from './schemas/media.js';
 export * from './schemas/analytics.js';
 export * from './schemas/content.js';
 export * from './schemas/collections.js';
+export * from './schemas/content-pages.js';
