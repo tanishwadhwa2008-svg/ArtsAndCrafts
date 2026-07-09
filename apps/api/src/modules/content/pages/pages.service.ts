@@ -95,6 +95,9 @@ export async function createContentPage(
   shopId: string,
   input: CreateContentPageInput,
 ): Promise<ContentPage> {
+  if (input.type === 'HOME') {
+    throw new BadRequestError('The homepage is managed from the Homepage editor');
+  }
   await assertSlugAvailable(shopId, input.slug);
   return prisma.contentPage.create({
     data: {

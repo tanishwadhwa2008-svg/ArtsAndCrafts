@@ -79,6 +79,14 @@ describe.skipIf(!sellerReady)('content pages & blocks (e2e)', () => {
     createdPageIds.push(pageId);
   });
 
+  it('refuses to create a HOME page via /pages', async () => {
+    const res = await request(app)
+      .post('/api/v1/content/pages')
+      .set(auth(token))
+      .send({ title: 'Fake home', slug: `e2e-home-${suffix}`, type: 'HOME' });
+    expect(res.status).toBe(400);
+  });
+
   it('adds a HERO block', async () => {
     const res = await request(app)
       .post(`/api/v1/content/pages/${pageId}/blocks`)
