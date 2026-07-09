@@ -8,6 +8,7 @@ import { contentRouter } from '../../modules/content/pages/pages.routes.js';
 import { inventoryRouter } from '../../modules/inventory/inventory.routes.js';
 import { mediaRouter } from '../../modules/media/media.routes.js';
 import { analyticsRouter } from '../../modules/analytics/analytics.routes.js';
+import { publicRouter } from '../../modules/public/public.routes.js';
 
 /**
  * Version 1 API router.
@@ -27,6 +28,8 @@ v1Router.get('/', (_req, res) => {
 });
 
 v1Router.use('/auth', authRouter);
+// Public, unauthenticated storefront API.
+v1Router.use('/public', publicRouter);
 v1Router.use('/categories', categoriesRouter);
 v1Router.use('/products', productsRouter);
 v1Router.use('/collections', collectionsRouter);
