@@ -19,6 +19,8 @@ const repoRoot = path.join(import.meta.dirname, '..');
 
 export default defineConfig({
   testDir: './tests',
+  // Hard-purges only `e2e-` prefixed rows after the run (see the file).
+  globalTeardown: './tests/global-teardown.ts',
   // Serial + single worker: the suite shares one dev database, so determinism
   // matters more than raw speed here.
   fullyParallel: false,
