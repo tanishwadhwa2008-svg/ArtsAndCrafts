@@ -3,7 +3,7 @@ import { BloomLoader, Button } from '@arts/ui';
 
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-6 py-24 text-center">
+    <section className="mx-auto flex min-h-[68vh] max-w-4xl flex-col items-center justify-center px-6 py-24 text-center">
       <p className="eyebrow mb-5">Arts and Crafts of India</p>
 
       <h1 className="font-display text-4xl leading-[1.1] text-gold-300 sm:text-6xl">
@@ -29,6 +29,6 @@ export default function HomePage() {
           Storefront · scaffold
         </span>
       </div>
-    </main>
+    </section>
   );
 }

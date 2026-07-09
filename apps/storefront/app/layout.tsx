@@ -17,6 +17,10 @@ import '@fontsource/manrope/700.css';
 
 import './globals.css';
 
+import { AnnouncementBar } from '@/components/site/announcement-bar';
+import { Footer } from '@/components/site/footer';
+import { Header } from '@/components/site/header';
+
 export const metadata: Metadata = {
   title: {
     default: 'Arts and Crafts of India — Handcrafted Heritage',
@@ -29,7 +33,22 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:border focus:border-gold-500 focus:bg-bg focus:px-4 focus:py-2 focus:text-xs focus:uppercase focus:tracking-[0.14em] focus:text-gold-200"
+        >
+          Skip to content
+        </a>
+        <div className="flex min-h-screen flex-col">
+          <AnnouncementBar />
+          <Header />
+          <main id="main-content" className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </div>
+      </body>
     </html>
   );
 }
