@@ -3,7 +3,7 @@ import { BadgeCheck, Globe, Handshake } from 'lucide-react';
 import { Button } from '@arts/ui';
 import { getHomeFeed } from '@/lib/storefront';
 import { CollectionCarousel } from '@/components/shop/collection-carousel';
-import { OrnateFrame, Paisley } from '@/components/site/ornaments';
+import { OrnateFrame } from '@/components/site/ornaments';
 
 // Always render against the current catalogue (in sync with inventory/images).
 export const dynamic = 'force-dynamic';
@@ -23,14 +23,14 @@ const heritageValues = [
   },
   {
     title: 'Living traditions',
-    body: 'Each piece you bring home helps a centuries-old craft — and the makers behind it — continue to thrive.',
+    body: 'Each piece you bring home helps a centuries-old craft and the makers behind it continue to thrive.',
   },
 ];
 
 const artisanPromises = [
   {
     title: 'Direct from the artisan',
-    body: 'Sourced straight from the makers and their workshops — never mass-produced.',
+    body: 'Sourced straight from the makers and their workshops, never mass-produced.',
     Icon: Handshake,
   },
   {
@@ -51,25 +51,19 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Pulled up under the sticky header (-mt-16 + matching pt-16) so the
-          rotating mandala sits behind the translucent nav without shifting the
-          hero content. */}
-      <section className="relative isolate -mt-16 overflow-hidden pt-16">
-        {/* Silk grain + warm gold sheen behind the frame. */}
-        <div
-          aria-hidden="true"
-          className="texture-silk pointer-events-none absolute inset-0 -z-20 opacity-[0.06]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(72%_60%_at_50%_-10%,rgba(201,159,74,0.14),transparent_70%)]"
-        />
+      {/* Fixed golden-ratio backdrop: it stays pinned to the viewport while the
+          opaque sections below scroll up and over it, so the rotating mandala
+          reads as a stationary layer the page slides across. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      >
+        {/* Silk grain + warm gold sheen. */}
+        <div className="texture-silk absolute inset-0 opacity-[0.06]" />
+        <div className="absolute inset-0 bg-[radial-gradient(72%_60%_at_50%_-10%,rgba(201,159,74,0.14),transparent_70%)]" />
         {/* Rotating golden-ratio sacred-geometry mandala (oversized + centred so
-            the spin never exposes empty corners; clipped by the hero). */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[150vmax] w-[150vmax] -translate-x-1/2 -translate-y-1/2"
-        >
+            the spin never exposes empty corners; clipped to the viewport). */}
+        <div className="absolute left-1/2 top-1/2 h-[150vmax] w-[150vmax] -translate-x-1/2 -translate-y-1/2">
           <div
             className="h-full w-full opacity-[0.08] animate-[slowRotate_90s_linear_infinite]"
             style={{
@@ -80,7 +74,10 @@ export default async function HomePage() {
             }}
           />
         </div>
+      </div>
 
+      {/* Hero — transparent so the fixed backdrop shows through behind the text. */}
+      <section className="relative">
         <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
           <OrnateFrame className="flex flex-col items-center px-6 py-16 text-center sm:px-12 sm:py-20">
             <p className="eyebrow mb-5">Handcrafted in India</p>
@@ -92,9 +89,9 @@ export default async function HomePage() {
             </h1>
 
             <p className="mt-7 max-w-xl font-serif text-lg italic leading-relaxed text-muted sm:text-xl">
-              A living archive of India&rsquo;s master craftsmanship — every piece
-              shaped by hand, carrying the story of its maker, its materials, and
-              the centuries-old tradition it belongs to.
+              A living archive of India&rsquo;s master craftsmanship. Every piece
+              is shaped by hand, carrying the story of its maker, its materials,
+              and the centuries-old tradition it belongs to.
             </p>
 
             <div className="mt-11">
@@ -111,6 +108,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Opaque wine layer: every section below scrolls up over the fixed
+          backdrop, covering the mandala for a true overlap. */}
+      <div className="relative z-10 bg-bg">
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
           <p className="eyebrow">Why our craft endures</p>
@@ -151,14 +151,14 @@ export default async function HomePage() {
         <div className="mx-auto mt-6 max-w-2xl space-y-5 text-base leading-relaxed text-muted">
           <p>
             For centuries, India&rsquo;s artisans have shaped everyday materials
-            — clay and brass, wool and wood, pigment and thread — into objects of
-            quiet, lasting beauty. We work directly with the master craftspeople
-            who still practise these techniques, exactly as they were handed down
-            through generations.
+            into objects of quiet, lasting beauty, transforming clay and brass,
+            wool and wood, pigment and thread with their hands. We work directly
+            with the master craftspeople who still practise these techniques,
+            exactly as they were handed down through generations.
           </p>
           <p>
             Nothing here is mass-produced or made to be replaced. Each piece is
-            built by hand to be lived with for a lifetime and passed on — carrying
+            built by hand to be lived with for a lifetime and passed on, carrying
             its craft, and its story, into the years ahead.
           </p>
         </div>
@@ -190,16 +190,17 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+      </div>
 
-      <section className="relative isolate overflow-hidden">
-        <Paisley className="pointer-events-none absolute -bottom-16 -left-16 -z-10 h-80 w-80 -scale-x-100 text-gold-500/[0.05]" />
+      {/* Closing CTA — transparent so the fixed mandala shows through again. */}
+      <section className="relative">
         <div className="mx-auto max-w-3xl px-6 py-24 text-center">
           <p className="eyebrow">Begin your collection</p>
           <h2 className="mt-3 font-display text-3xl text-gold-300 sm:text-4xl">
             Bring a piece of India home
           </h2>
           <p className="mx-auto mt-5 max-w-xl font-serif text-lg italic leading-relaxed text-muted">
-            Explore handcrafted treasures made by India&rsquo;s finest artisans —
+            Explore handcrafted treasures made by India&rsquo;s finest artisans,
             or discover the story behind the craft.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
