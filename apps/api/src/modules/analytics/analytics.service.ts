@@ -43,11 +43,13 @@ export async function getAnalyticsSummary(shopId: string): Promise<AnalyticsSumm
       where: { shopId, deletedAt: null },
       select: { id: true, name: true },
     }),
-    // Units + value grouped by currency (variant price falls back to base price).
+    // Units + value grouped by currency. Stock is valued at the product's
+    // base price — the same figure shown on the storefront — so the dashboard
+    // total stays consistent with catalog pricing.
     prisma.$queryRaw<InventoryAggregateRow[]>`
       SELECT p.currency AS currency,
              COALESCE(SUM(i.quantity), 0) AS units,
-             COALESCE(SUM(i.quantity * COALESCE(v.price, p."basePrice")), 0) AS value
+             COALESCE(SUM(i.quantity * p."basePrice"), 0) AS value
       FROM inventory i
       JOIN product_variants v ON v.id = i."variantId"
       JOIN products p ON p.id = v."productId"
