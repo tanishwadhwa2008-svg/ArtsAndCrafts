@@ -38,7 +38,7 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-5">
+      <nav className="flex-1 space-y-1 py-5">
         {NAV.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
@@ -47,9 +47,9 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
+                'flex items-center gap-3 px-6 py-2.5 text-sm transition-colors',
                 isActive
-                  ? 'bg-gold-500/10 text-gold-300 shadow-[inset_2px_0_0_0_var(--color-gold-500)]'
+                  ? 'bg-gold-500/10 text-gold-300'
                   : 'text-muted hover:bg-white/5 hover:text-fg',
               )
             }
