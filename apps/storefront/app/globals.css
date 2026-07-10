@@ -29,10 +29,11 @@
 
 @utility eyebrow {
   font-family: var(--font-serif);
-  color: var(--color-gold-500);
+  color: var(--color-gold-400);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 /* Fine woven-thread grain for a silk/velvet feel over the wine canvas. */
