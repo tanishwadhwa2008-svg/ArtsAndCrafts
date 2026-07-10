@@ -71,6 +71,17 @@
   }
 }
 
+/* Infinite marquee (About-page craft ticker). Scrolls one copy of a duplicated
+   track, so translateX(-50%) loops seamlessly. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   [data-drawer-content][data-state='open'] {
     animation: drawer-slide-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
