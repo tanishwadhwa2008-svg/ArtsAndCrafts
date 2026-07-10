@@ -3,7 +3,6 @@ import { ArrowLeft, ArrowRight, ImagePlus, Star, Trash2 } from 'lucide-react';
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_BYTES, type UploadUrlInput } from '@arts/shared';
 import type { ProductImage } from '../../api/catalog.js';
 import { requestUploadUrl, uploadToStorage } from '../../api/catalog.js';
-import { compressImage } from '../../lib/image-compression.js';
 import {
   useAddImage,
   useDeleteImage,
@@ -19,10 +18,10 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  Spinner,
 } from '@arts/ui';
 import { ApiError } from '../../lib/api.js';
 import { cn } from '../../lib/cn.js';
+import { ImageCropDialog } from './ImageCropDialog.js';
 
 export function ImagesSection({
   productId,
@@ -32,7 +31,7 @@ export function ImagesSection({
   images: ProductImage[];
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
+  const [cropFile, setCropFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const addMut = useAddImage(productId);
@@ -82,40 +81,35 @@ export function ImagesSection({
     });
   };
 
-  const handleFile = async (file: File) => {
+  const openCropper = (file: File) => {
     setError(null);
     if (!ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number])) {
       setError('Unsupported file type. Use JPEG, PNG, WebP or GIF.');
       return;
     }
-    setUploading(true);
-    try {
-      // Optimize in the browser first so only the compressed payload is uploaded.
-      const { file: optimized } = await compressImage(file);
-      if (optimized.size > MAX_UPLOAD_BYTES) {
-        setError('File is too large (max 5 MB after optimization).');
-        return;
-      }
-      const target = await requestUploadUrl({
-        fileName: optimized.name,
-        contentType: optimized.type as UploadUrlInput['contentType'],
-        size: optimized.size,
-      });
-      await uploadToStorage(target.uploadUrl, optimized);
-      await addMut.mutateAsync({
-        storageKey: target.storageKey,
-        url: target.publicUrl,
-        position: images.length,
-        isPrimary: images.length === 0,
-      });
-      toast.success('Image uploaded.');
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'Upload failed.';
-      setError(message);
-      toast.error(message);
-    } finally {
-      setUploading(false);
+    setCropFile(file);
+  };
+
+  // Uploads the cropped WebP the editor produced. Rejects so the crop dialog can
+  // surface the error and stay open; resolves and closes it on success.
+  const uploadCropped = async (cropped: File) => {
+    if (cropped.size > MAX_UPLOAD_BYTES) {
+      throw new Error('Image is too large (max 5 MB).');
     }
+    const target = await requestUploadUrl({
+      fileName: cropped.name,
+      contentType: cropped.type as UploadUrlInput['contentType'],
+      size: cropped.size,
+    });
+    await uploadToStorage(target.uploadUrl, cropped);
+    await addMut.mutateAsync({
+      storageKey: target.storageKey,
+      url: target.publicUrl,
+      position: images.length,
+      isPrimary: images.length === 0,
+    });
+    toast.success('Image uploaded.');
+    setCropFile(null);
   };
 
   return (
@@ -131,7 +125,7 @@ export function ImagesSection({
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file) void handleFile(file);
+            if (file) openCropper(file);
             e.target.value = '';
           }}
         />
@@ -149,7 +143,7 @@ export function ImagesSection({
                 <img
                   src={img.url}
                   alt={img.altText ?? 'Product image'}
-                  className="aspect-square w-full object-cover"
+                  className="aspect-[4/5] w-full object-cover"
                 />
                 {img.isPrimary ? (
                   <Badge variant="gold" className="absolute left-2 top-2">
@@ -212,11 +206,18 @@ export function ImagesSection({
         {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
 
         <div className="mt-5">
-          <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={uploading}>
-            {uploading ? <Spinner /> : <ImagePlus className="h-4 w-4" />}
-            {uploading ? 'Uploading…' : 'Upload image'}
+          <Button variant="outline" onClick={() => fileRef.current?.click()}>
+            <ImagePlus className="h-4 w-4" />
+            Upload image
           </Button>
         </div>
+
+        <ImageCropDialog
+          open={cropFile !== null}
+          file={cropFile}
+          onCancel={() => setCropFile(null)}
+          onApply={uploadCropped}
+        />
       </CardContent>
     </Card>
   );
