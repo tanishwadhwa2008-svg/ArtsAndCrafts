@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Button } from '@arts/ui';
 import { Breadcrumbs } from '@/components/site/breadcrumbs';
+import { ProductGallery } from '@/components/shop/product-gallery';
 import { getProduct } from '@/lib/storefront';
 import { formatPrice } from '@/lib/format';
 import { titleFromSlug } from '@/lib/slug';
@@ -20,8 +20,6 @@ export default async function ProductPage({ params }: Params) {
   const product = await getProduct(params.slug);
   if (!product) notFound();
 
-  const [primary, ...rest] = product.images;
-
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 pb-24 sm:px-6 lg:px-8">
       <Breadcrumbs
@@ -34,38 +32,7 @@ export default async function ProductPage({ params }: Params) {
 
       <div className="mt-10 grid gap-10 lg:grid-cols-2 lg:gap-16">
         {/* Gallery */}
-        <div>
-          <div className="relative aspect-[4/5] w-full overflow-hidden border border-line bg-gradient-to-b from-surface to-surface-2">
-            {primary ? (
-              <Image
-                src={primary.url}
-                alt={primary.altText ?? product.title}
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-                priority
-              />
-            ) : null}
-          </div>
-          {rest.length > 0 ? (
-            <div className="mt-4 grid grid-cols-4 gap-3">
-              {rest.slice(0, 4).map((img, index) => (
-                <div
-                  key={index}
-                  className="relative aspect-square overflow-hidden border border-line bg-surface-2"
-                >
-                  <Image
-                    src={img.url}
-                    alt={img.altText ?? product.title}
-                    fill
-                    sizes="12vw"
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
+        <ProductGallery images={product.images} title={product.title} />
 
         {/* Product information */}
         <div className="lg:pt-6">
