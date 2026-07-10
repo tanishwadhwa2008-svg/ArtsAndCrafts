@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import '@arts/ui/theme-base.css';
-@import '@arts/ui/theme-wine.css';
+@import '@arts/ui/theme-noir.css';
 
 /* Scan the design-system components so their utility classes are generated.
    Tailwind v4 ignores node_modules by default. */

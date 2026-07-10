@@ -60,7 +60,7 @@ export default async function HomePage() {
       >
         {/* Silk grain + warm gold sheen. */}
         <div className="texture-silk absolute inset-0 opacity-[0.06]" />
-        <div className="absolute inset-0 bg-[radial-gradient(72%_60%_at_50%_-10%,rgba(201,159,74,0.14),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(72%_60%_at_50%_-10%,rgba(227,185,72,0.16),transparent_70%)]" />
         {/* Rotating golden-ratio sacred-geometry mandala (oversized + centred so
             the spin never exposes empty corners; clipped to the viewport). */}
         <div className="absolute left-1/2 top-1/2 h-[150vmax] w-[150vmax] -translate-x-1/2 -translate-y-1/2">

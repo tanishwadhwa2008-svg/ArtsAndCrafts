@@ -5,7 +5,7 @@ import type { CollectionCard as CollectionCardData } from '@/lib/storefront';
 export function CollectionCard({ collection }: { collection: CollectionCardData }) {
   return (
     <Link href={`/collections/${collection.slug}`} className="group block focus-visible:outline-none">
-      <div className="relative aspect-[3/2] w-full overflow-hidden border border-line bg-gradient-to-b from-[#1a1210] to-[#100b09]">
+      <div className="relative aspect-[3/2] w-full overflow-hidden border border-line bg-gradient-to-b from-surface-2 to-bg">
         {collection.coverUrl ? (
           <Image
             src={collection.coverUrl}

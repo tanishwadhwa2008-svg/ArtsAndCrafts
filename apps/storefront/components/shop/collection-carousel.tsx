@@ -73,7 +73,7 @@ export function CollectionCarousel({ collections }: { collections: CollectionCar
                 tabIndex={i === index ? 0 : -1}
                 className="group grid grid-cols-1 md:grid-cols-2"
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-b from-[#1a1210] to-[#100b09] md:aspect-auto md:min-h-[26rem]">
+                <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-b from-surface-2 to-bg md:aspect-auto md:min-h-[26rem]">
                   {collection.coverUrl ? (
                     <Image
                       src={collection.coverUrl}

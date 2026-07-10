@@ -1,0 +1,45 @@
+/*
+ * Arts & Crafts of India — NOIR (BLACK / GOLD) palette (public storefront).
+ *
+ * A warm near-black canvas with aged-gold accents — a restrained, luxury
+ * black/gold register. Palette layer only: it overrides the SAME colour token
+ * names as `theme-admin.css` / `theme-heritage.css` / `theme-wine.css` (and
+ * keeps the same light-on-dark polarity), so shared components render with zero
+ * component changes.
+ *
+ * Readability guardrails: `--color-fg` / `--color-muted` are warm white/greys
+ * so body copy stays legible on black (gold is reserved for headings &
+ * accents); every text/gold pairing clears WCAG 2.1 AA on these surfaces.
+ * Surfaces are a warm near-black (not pure #000) so the gold reads rich rather
+ * than cold. This file is the single tuning surface for the storefront palette.
+ *
+ * Usage (e.g. in the storefront):
+ *   @import 'tailwindcss';
+ *   @import '@arts/ui/theme-base.css';
+ *   @import '@arts/ui/theme-noir.css';
+ */
+@theme {
+  /* Surfaces — warm near-black (deliberately not pure #000, to flatter gold) */
+  --color-bg: #0c0b0a;
+  --color-surface: #161513;
+  --color-surface-2: #1e1c19;
+  --color-elevated: #272420;
+
+  /* Gold accent scale — brightened, more saturated gold */
+  --color-gold-300: #f6dd93;
+  --color-gold-400: #eec96b;
+  --color-gold-500: #e3b948;
+  --color-gold-600: #c4952f;
+  --color-gold-700: #9b7527;
+
+  /* Text — warm white (headings/accents go gold) */
+  --color-fg: #f3ede2;
+  --color-muted: #c8c0b3;
+  --color-faint: #978d7e;
+
+  /* Lines & states — thin gold hairlines on black */
+  --color-line: rgba(227, 185, 72, 0.22);
+  --color-line-strong: rgba(227, 185, 72, 0.4);
+  --color-danger: #e06a63;
+  --color-success: #6fbf8e;
+}
