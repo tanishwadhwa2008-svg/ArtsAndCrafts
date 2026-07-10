@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { LayoutDashboard, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { Category } from '../api/catalog.js';
 import { useCategories } from '../hooks/queries.js';
 import { useDeleteCategory } from '../hooks/mutations.js';
@@ -51,6 +52,12 @@ export function CategoriesPage() {
 
   return (
     <div>
+      <Button asChild variant="ghost" size="sm" className="mb-4 -ml-2">
+        <Link to="/">
+          <LayoutDashboard className="h-4 w-4" /> Back to Dashboard
+        </Link>
+      </Button>
+
       <PageHeader
         eyebrow="Catalog"
         title="Categories"

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, LayoutDashboard } from 'lucide-react';
 import { SUPPORTED_CURRENCIES, createProductSchema, type CreateProductInput } from '@arts/shared';
 import { useCategories, useProduct } from '../../hooks/queries.js';
 import { useCreateProduct, useUpdateProduct } from '../../hooks/mutations.js';
@@ -110,12 +110,18 @@ export function ProductFormPage() {
 
   return (
     <div>
-      <Link
-        to="/products"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-gold-300"
-      >
-        <ArrowLeft className="h-4 w-4" /> Back to products
-      </Link>
+      <div className="mb-4 flex flex-wrap items-center gap-1">
+        <Button asChild variant="ghost" size="sm" className="-ml-2">
+          <Link to="/">
+            <LayoutDashboard className="h-4 w-4" /> Back to Dashboard
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="sm">
+          <Link to="/products">
+            <ArrowLeft className="h-4 w-4" /> Back to products
+          </Link>
+        </Button>
+      </div>
 
       <PageHeader eyebrow="Catalog" title={isEdit ? 'Edit product' : 'New product'} />
 

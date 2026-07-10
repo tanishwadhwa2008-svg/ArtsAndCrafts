@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, LayoutDashboard } from 'lucide-react';
 import { createCollectionSchema, type CreateCollectionInput } from '@arts/shared';
 import { useCollection } from '../../hooks/queries.js';
 import { useCreateCollection, useUpdateCollection } from '../../hooks/mutations.js';
@@ -95,12 +95,18 @@ export function CollectionFormPage() {
 
   return (
     <div>
-      <Link
-        to="/collections"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-gold-300"
-      >
-        <ArrowLeft className="h-4 w-4" /> Back to collections
-      </Link>
+      <div className="mb-4 flex flex-wrap items-center gap-1">
+        <Button asChild variant="ghost" size="sm" className="-ml-2">
+          <Link to="/">
+            <LayoutDashboard className="h-4 w-4" /> Back to Dashboard
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="sm">
+          <Link to="/collections">
+            <ArrowLeft className="h-4 w-4" /> Back to collections
+          </Link>
+        </Button>
+      </div>
 
       <PageHeader eyebrow="Storefront" title={isEdit ? 'Edit collection' : 'New collection'} />
 
