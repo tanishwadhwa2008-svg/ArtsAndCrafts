@@ -31,7 +31,7 @@ export function ImagesSection({
   images: ProductImage[];
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [cropFile, setCropFile] = useState<File | null>(null);
+  const [cropFiles, setCropFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const addMut = useAddImage(productId);
@@ -81,35 +81,57 @@ export function ImagesSection({
     });
   };
 
-  const openCropper = (file: File) => {
+  const openCropper = (fileList: FileList) => {
     setError(null);
-    if (!ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number])) {
+    const all = Array.from(fileList);
+    const valid = all.filter((f) =>
+      ALLOWED_IMAGE_TYPES.includes(f.type as (typeof ALLOWED_IMAGE_TYPES)[number]),
+    );
+    if (valid.length === 0) {
       setError('Unsupported file type. Use JPEG, PNG, WebP or GIF.');
       return;
     }
-    setCropFile(file);
+    if (valid.length < all.length) {
+      setError(`${all.length - valid.length} file(s) skipped — unsupported type.`);
+    }
+    setCropFiles(valid);
   };
 
-  // Uploads the cropped WebP the editor produced. Rejects so the crop dialog can
-  // surface the error and stay open; resolves and closes it on success.
-  const uploadCropped = async (cropped: File) => {
-    if (cropped.size > MAX_UPLOAD_BYTES) {
-      throw new Error('Image is too large (max 5 MB).');
+  // Uploads the cropped batch the editor produced, in order. Each image uploads
+  // independently so one failure never re-uploads (and duplicates) the ones that
+  // already succeeded; the outcome is summarised via toasts and the dialog closes.
+  const uploadBatch = async (cropped: File[]) => {
+    let uploaded = 0;
+    let failed = 0;
+    for (const file of cropped) {
+      try {
+        if (file.size > MAX_UPLOAD_BYTES) {
+          throw new Error('too large');
+        }
+        const target = await requestUploadUrl({
+          fileName: file.name,
+          contentType: file.type as UploadUrlInput['contentType'],
+          size: file.size,
+        });
+        await uploadToStorage(target.uploadUrl, file);
+        await addMut.mutateAsync({
+          storageKey: target.storageKey,
+          url: target.publicUrl,
+          position: images.length + uploaded,
+          isPrimary: images.length === 0 && uploaded === 0,
+        });
+        uploaded += 1;
+      } catch {
+        failed += 1;
+      }
     }
-    const target = await requestUploadUrl({
-      fileName: cropped.name,
-      contentType: cropped.type as UploadUrlInput['contentType'],
-      size: cropped.size,
-    });
-    await uploadToStorage(target.uploadUrl, cropped);
-    await addMut.mutateAsync({
-      storageKey: target.storageKey,
-      url: target.publicUrl,
-      position: images.length,
-      isPrimary: images.length === 0,
-    });
-    toast.success('Image uploaded.');
-    setCropFile(null);
+    if (uploaded > 0) {
+      toast.success(uploaded === 1 ? 'Image uploaded.' : `${uploaded} images uploaded.`);
+    }
+    if (failed > 0) {
+      toast.error(`${failed} image${failed === 1 ? '' : 's'} failed to upload.`);
+    }
+    setCropFiles([]);
   };
 
   return (
@@ -122,10 +144,10 @@ export function ImagesSection({
           ref={fileRef}
           type="file"
           accept={ALLOWED_IMAGE_TYPES.join(',')}
+          multiple
           className="hidden"
           onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) openCropper(file);
+            if (e.target.files && e.target.files.length > 0) openCropper(e.target.files);
             e.target.value = '';
           }}
         />
@@ -208,15 +230,15 @@ export function ImagesSection({
         <div className="mt-5">
           <Button variant="outline" onClick={() => fileRef.current?.click()}>
             <ImagePlus className="h-4 w-4" />
-            Upload image
+            Upload images
           </Button>
         </div>
 
         <ImageCropDialog
-          open={cropFile !== null}
-          file={cropFile}
-          onCancel={() => setCropFile(null)}
-          onApply={uploadCropped}
+          open={cropFiles.length > 0}
+          files={cropFiles}
+          onCancel={() => setCropFiles([])}
+          onComplete={uploadBatch}
         />
       </CardContent>
     </Card>
