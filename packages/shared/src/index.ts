@@ -18,3 +18,4 @@ export * from './schemas/content.js';
 export * from './schemas/collections.js';
 export * from './schemas/content-pages.js';
 export * from './schemas/settings.js';
+export * from './schemas/ai.js';

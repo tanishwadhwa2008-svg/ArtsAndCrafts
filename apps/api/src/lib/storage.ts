@@ -1,4 +1,4 @@
-import { S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { env, isStorageConfigured } from '../config/env.js';
 import { AppError } from './errors.js';
 
@@ -37,4 +37,25 @@ export function getBucket(): string {
 export function publicUrlFor(storageKey: string): string {
   const base = env.S3_PUBLIC_URL ?? `${env.S3_ENDPOINT}/${env.S3_BUCKET}`;
   return `${base.replace(/\/$/, '')}/${storageKey}`;
+}
+
+/**
+ * Fetches an object's raw bytes from storage. Used server-side to read uploaded
+ * images back so they can be base64-encoded and sent to the AI vision provider
+ * (external providers cannot reach local MinIO URLs).
+ */
+export async function getObjectBytes(
+  storageKey: string,
+): Promise<{ body: Buffer; contentType: string | undefined }> {
+  const result = await getS3Client().send(
+    new GetObjectCommand({ Bucket: getBucket(), Key: storageKey }),
+  );
+  if (!result.Body) {
+    throw new AppError('Object not found in storage', {
+      statusCode: 404,
+      code: 'OBJECT_NOT_FOUND',
+    });
+  }
+  const bytes = await result.Body.transformToByteArray();
+  return { body: Buffer.from(bytes), contentType: result.ContentType };
 }

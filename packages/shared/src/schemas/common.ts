@@ -31,6 +31,20 @@ export const slugSchema = z
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Must be a lowercase, hyphen-separated slug');
 
 /**
+ * Derives a URL-safe slug from arbitrary text (lowercase, hyphen-separated).
+ * Mirrors the seller-web form helper so slugs derived on the API match those
+ * the UI would have produced.
+ */
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 140);
+}
+
+/**
  * A monetary amount accepted from clients. Accepts a number or string and
  * validates a non-negative value with at most 2 decimal places. Stored/returned
  * as a string to avoid float precision loss.

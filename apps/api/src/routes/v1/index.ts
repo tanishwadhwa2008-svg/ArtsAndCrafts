@@ -10,6 +10,7 @@ import { mediaRouter } from '../../modules/media/media.routes.js';
 import { analyticsRouter } from '../../modules/analytics/analytics.routes.js';
 import { settingsRouter } from '../../modules/settings/settings.routes.js';
 import { publicRouter } from '../../modules/public/public.routes.js';
+import { aiRouter } from '../../modules/ai/ai.routes.js';
 
 /**
  * Version 1 API router.
@@ -39,3 +40,4 @@ v1Router.use('/inventory', inventoryRouter);
 v1Router.use('/media', mediaRouter);
 v1Router.use('/analytics', analyticsRouter);
 v1Router.use('/settings', settingsRouter);
+v1Router.use('/ai', aiRouter);

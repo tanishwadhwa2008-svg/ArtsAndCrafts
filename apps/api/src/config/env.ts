@@ -62,6 +62,15 @@ const envSchema = z.object({
     .default('true')
     .transform((value) => value !== 'false'),
 
+  // AI-assisted bulk cataloguing (OpenAI-compatible vision endpoint). Optional —
+  // the bulk-upload endpoints report unavailable (503) until AI_API_KEY is set,
+  // so the feature stays dormant where no AI credentials are provided.
+  AI_API_BASE_URL: z.string().url().default('https://api.openai.com/v1'),
+  AI_API_KEY: z.string().min(1).optional(),
+  AI_MODEL: z.string().trim().min(1).default('gpt-4o-mini'),
+  AI_TIMEOUT_MS: z.coerce.number().int().positive().default(60_000),
+  AI_MAX_IMAGES: z.coerce.number().int().positive().max(50).default(12),
+
   // Trust the first proxy hop (needed for correct client IPs / rate limiting
   // behind a reverse proxy). Disabled by default for local development.
   TRUST_PROXY: z
@@ -161,3 +170,10 @@ export const isTest = env.NODE_ENV === 'test';
 export const isStorageConfigured = Boolean(
   env.S3_ENDPOINT && env.S3_ACCESS_KEY && env.S3_SECRET_KEY && env.S3_BUCKET,
 );
+
+/**
+ * Whether the AI vision provider is configured. The bulk-upload endpoints
+ * report unavailable (503) until an API key is supplied, keeping the feature
+ * cleanly dormant in environments without AI credentials.
+ */
+export const isAiConfigured = Boolean(env.AI_API_KEY);
