@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  aiCommitSchema,
   collectionListQuerySchema,
   createCollectionSchema,
   idParamSchema,
@@ -27,6 +28,12 @@ collectionsRouter.post(
   '/',
   validate({ body: createCollectionSchema }),
   asyncHandler(controller.createCollectionHandler),
+);
+
+collectionsRouter.post(
+  '/ai-commit',
+  validate({ body: aiCommitSchema }),
+  asyncHandler(controller.aiCommitHandler),
 );
 
 collectionsRouter.get(

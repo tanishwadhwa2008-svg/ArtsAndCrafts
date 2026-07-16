@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import type {
+  AiCommitInput,
   ApiSuccess,
   CollectionListQuery,
   CreateCollectionInput,
@@ -79,4 +80,15 @@ export async function setCollectionProductsHandler(req: Request, res: Response):
     data: serializeCollectionDetail(collection),
   };
   res.json(body);
+}
+
+export async function aiCommitHandler(req: Request, res: Response): Promise<void> {
+  const shopId = requireShopId(req);
+  const input = req.validated.body as AiCommitInput;
+  const collection = await collectionsService.commitAiCollection(shopId, input);
+  const body: ApiSuccess<CollectionDetailDto> = {
+    ok: true,
+    data: serializeCollectionDetail(collection),
+  };
+  res.status(201).json(body);
 }

@@ -1,9 +1,11 @@
-import type { Collection, Prisma } from '@prisma/client';
+import { Prisma, type Collection } from '@prisma/client';
 import type {
+  AiCommitInput,
   CollectionListQuery,
   CreateCollectionInput,
   UpdateCollectionInput,
 } from '@arts/shared';
+import { slugify } from '@arts/shared';
 import { prisma } from '../../../db/prisma.js';
 import { BadRequestError, ConflictError, NotFoundError } from '../../../lib/errors.js';
 
@@ -171,4 +173,138 @@ export async function setCollectionProducts(
   ]);
 
   return getCollection(shopId, id);
+}
+
+/**
+ * Resolves a slug that is unique within the shop, appending `-2`, `-3`, ... on
+ * collision. `seen` guards against duplicates created earlier in the same batch,
+ * and `exists` checks the database (inside the surrounding transaction).
+ */
+async function resolveUniqueSlug(
+  base: string,
+  seen: Set<string>,
+  exists: (slug: string) => Promise<boolean>,
+): Promise<string> {
+  const root = base || 'item';
+  let candidate = root;
+  let n = 1;
+  while (seen.has(candidate) || (await exists(candidate))) {
+    n += 1;
+    candidate = `${root}-${n}`;
+  }
+  seen.add(candidate);
+  return candidate;
+}
+
+/**
+ * Persists a reviewed AI bulk-upload draft in a single transaction: creates the
+ * collection and one product per image (all DRAFT), attaches each primary image,
+ * resolves/creates suggested categories, de-duplicates slugs, and sets ordered
+ * membership. All-or-nothing — any failure rolls the whole thing back.
+ */
+export async function commitAiCollection(
+  shopId: string,
+  input: AiCommitInput,
+): Promise<CollectionDetailRow> {
+  return prisma.$transaction(async (tx) => {
+    const collectionSlug = await resolveUniqueSlug(
+      input.collection.slug,
+      new Set<string>(),
+      async (slug) =>
+        (await tx.collection.findFirst({
+          where: { shopId, slug, deletedAt: null },
+          select: { id: true },
+        })) !== null,
+    );
+
+    const { status } = input.collection;
+    const collection = await tx.collection.create({
+      data: {
+        shopId,
+        title: input.collection.title,
+        slug: collectionSlug,
+        description: input.collection.description,
+        status,
+        position: input.collection.position,
+        publishedAt: status === 'PUBLISHED' ? new Date() : null,
+      },
+    });
+
+    const seenProductSlugs = new Set<string>();
+    const categoryCache = new Map<string, string>();
+    const orderedProductIds: string[] = [];
+
+    for (const item of input.products) {
+      let categoryId: string | null = null;
+      if (item.categoryName) {
+        const categorySlug = slugify(item.categoryName);
+        categoryId = categoryCache.get(categorySlug) ?? null;
+        if (!categoryId) {
+          const existing = await tx.category.findFirst({
+            where: { shopId, slug: categorySlug, deletedAt: null },
+            select: { id: true },
+          });
+          categoryId =
+            existing?.id ??
+            (
+              await tx.category.create({
+                data: { shopId, name: item.categoryName, slug: categorySlug, position: 0 },
+              })
+            ).id;
+          categoryCache.set(categorySlug, categoryId);
+        }
+      }
+
+      const productSlug = await resolveUniqueSlug(
+        item.slug,
+        seenProductSlugs,
+        async (slug) =>
+          (await tx.product.findFirst({
+            where: { shopId, slug, deletedAt: null },
+            select: { id: true },
+          })) !== null,
+      );
+
+      const product = await tx.product.create({
+        data: {
+          shopId,
+          title: item.title,
+          slug: productSlug,
+          description: item.description,
+          status: 'DRAFT',
+          basePrice: new Prisma.Decimal(item.basePrice),
+          currency: input.currency,
+          categoryId,
+          metaTitle: item.metaTitle,
+          metaDescription: item.metaDescription,
+        },
+      });
+
+      await tx.productImage.create({
+        data: {
+          productId: product.id,
+          storageKey: item.storageKey,
+          url: item.url,
+          altText: item.altText,
+          position: 0,
+          isPrimary: true,
+        },
+      });
+
+      orderedProductIds.push(product.id);
+    }
+
+    await tx.collectionProduct.createMany({
+      data: orderedProductIds.map((productId, index) => ({
+        collectionId: collection.id,
+        productId,
+        position: index,
+      })),
+    });
+
+    return tx.collection.findFirstOrThrow({
+      where: { id: collection.id },
+      include: detailInclude,
+    });
+  });
 }
