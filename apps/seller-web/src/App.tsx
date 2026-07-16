@@ -8,6 +8,7 @@ import { ProductFormPage } from './pages/products/ProductFormPage.js';
 import { CategoriesPage } from './pages/CategoriesPage.js';
 import { CollectionsPage } from './pages/CollectionsPage.js';
 import { CollectionFormPage } from './pages/collections/CollectionFormPage.js';
+import { AiBulkUploadPage } from './pages/collections/AiBulkUploadPage.js';
 import { HomepagePage } from './pages/HomepagePage.js';
 import { PagesPage } from './pages/PagesPage.js';
 import { PageEditorPage } from './pages/content/PageEditorPage.js';
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="collections" element={<CollectionsPage />} />
           <Route path="collections/new" element={<CollectionFormPage />} />
+          <Route path="collections/ai-bulk" element={<AiBulkUploadPage />} />
           <Route path="collections/:id/edit" element={<CollectionFormPage />} />
           <Route path="homepage" element={<HomepagePage />} />
           <Route path="pages" element={<PagesPage />} />

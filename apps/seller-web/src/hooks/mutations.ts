@@ -3,6 +3,7 @@ import * as api from '../api/catalog.js';
 import * as collectionsApi from '../api/collections.js';
 import * as contentApi from '../api/content.js';
 import * as settingsApi from '../api/settings.js';
+import * as aiApi from '../api/ai.js';
 
 /** Invalidates the queries affected by catalog/inventory mutations. */
 function useInvalidators() {
@@ -14,11 +15,26 @@ function useInvalidators() {
     inventory: () => qc.invalidateQueries({ queryKey: ['inventory'] }),
     collections: () => qc.invalidateQueries({ queryKey: ['collections'] }),
     collection: (id: string) => qc.invalidateQueries({ queryKey: ['collection', id] }),
+    allCollectionDetails: () => qc.invalidateQueries({ queryKey: ['collection'] }),
     home: () => qc.invalidateQueries({ queryKey: ['content', 'home'] }),
     contentPages: () => qc.invalidateQueries({ queryKey: ['content', 'pages'] }),
     contentPage: (id: string) => qc.invalidateQueries({ queryKey: ['content', 'page', id] }),
     settings: () => qc.invalidateQueries({ queryKey: ['settings'] }),
   };
+}
+
+// --- AI bulk upload ---
+
+export function useAiDraft() {
+  return useMutation({ mutationFn: aiApi.draftCollection });
+}
+
+export function useAiCommit() {
+  const inv = useInvalidators();
+  return useMutation({
+    mutationFn: aiApi.commitAiCollection,
+    onSuccess: () => inv.collections(),
+  });
 }
 
 // --- Storefront settings ---
@@ -76,6 +92,8 @@ export function useUpdateProduct() {
     onSuccess: (_data, args) => {
       inv.products();
       inv.product(args.id);
+      inv.collections();
+      inv.allCollectionDetails();
     },
   });
 }
@@ -84,7 +102,11 @@ export function useDeleteProduct() {
   const inv = useInvalidators();
   return useMutation({
     mutationFn: api.deleteProduct,
-    onSuccess: () => inv.products(),
+    onSuccess: () => {
+      inv.products();
+      inv.collections();
+      inv.allCollectionDetails();
+    },
   });
 }
 

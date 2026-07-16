@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { env } from '../../config/env.js';
 import { AppError } from '../../lib/errors.js';
+import { buildSystemPrompt } from './ai.prompt.js';
 
 /**
  * Thin client for an OpenAI-compatible chat/completions endpoint with vision.
@@ -37,20 +38,6 @@ export interface ProviderImage {
   base64: string;
   mimeType: string;
 }
-
-const SYSTEM_PROMPT = [
-  'You are a cataloguing assistant for an online store specialising in Indian arts, crafts and handmade goods.',
-  'You are shown a set of product photographs that together form ONE curated collection.',
-  'First describe the COLLECTION as a whole, then describe EACH image as its own product, in image order.',
-  'Return ONLY a single JSON object (no markdown, no prose) with exactly this shape:',
-  '{"collection":{"title":string,"description":string},"products":[{"imageIndex":number,"title":string,"description":string,"categoryName":string,"altText":string,"metaTitle":string,"metaDescription":string}]}',
-  'Rules:',
-  '- imageIndex is 0-based and matches the order the images were provided; produce exactly one product per image.',
-  '- Titles are concise (a few words). Descriptions are evocative but factual, 1-3 sentences.',
-  '- categoryName is a short, reusable craft category such as "Pottery", "Brassware", "Textiles" or "Woodwork".',
-  '- altText briefly describes the image for accessibility.',
-  '- Do NOT include price, cost, currency or availability, and never invent a price.',
-].join('\n');
 
 interface ChatResponse {
   choices?: { message?: { content?: unknown } }[];
@@ -117,7 +104,10 @@ function parseResponse(json: unknown): AiRawResult {
  * Sends the images to the model and returns the validated raw draft. Retries
  * once on a transient failure (network error, timeout or 5xx/429).
  */
-export async function generateCollectionDraft(images: ProviderImage[]): Promise<AiRawResult> {
+export async function generateCollectionDraft(
+  images: ProviderImage[],
+  categories: string[] = [],
+): Promise<AiRawResult> {
   if (!env.AI_API_KEY) {
     throw new AppError('AI is not configured', { statusCode: 503, code: 'AI_UNAVAILABLE' });
   }
@@ -126,7 +116,7 @@ export async function generateCollectionDraft(images: ProviderImage[]): Promise<
     model: env.AI_MODEL,
     response_format: { type: 'json_object' },
     messages: [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: buildSystemPrompt(categories) },
       {
         role: 'user',
         content: [

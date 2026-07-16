@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Sparkles, Trash2 } from 'lucide-react';
 import type { CollectionListItem } from '../api/collections.js';
-import { useCollections } from '../hooks/queries.js';
+import { useAiStatus, useCollections } from '../hooks/queries.js';
 import { useDeleteCollection } from '../hooks/mutations.js';
 import { ApiError } from '../lib/api.js';
 import {
@@ -21,6 +21,7 @@ import {
 
 export function CollectionsPage() {
   const { data, isLoading, isError } = useCollections();
+  const aiStatus = useAiStatus();
   const deleteMut = useDeleteCollection();
   const toast = useToast();
   const confirm = useConfirm();
@@ -47,10 +48,18 @@ export function CollectionsPage() {
         eyebrow="Storefront"
         title="Collections"
         actions={
-          <Button onClick={() => navigate('/collections/new')}>
-            <Plus className="h-4 w-4" />
-            New collection
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            {aiStatus.data?.available ? (
+              <Button variant="outline" onClick={() => navigate('/collections/ai-bulk')}>
+                <Sparkles className="h-4 w-4" />
+                AI Bulk Upload
+              </Button>
+            ) : null}
+            <Button onClick={() => navigate('/collections/new')}>
+              <Plus className="h-4 w-4" />
+              New collection
+            </Button>
+          </div>
         }
       />
 

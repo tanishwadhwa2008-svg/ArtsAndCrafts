@@ -16,13 +16,14 @@ import { BadRequestError, ConflictError, NotFoundError } from '../../../lib/erro
  */
 
 const listInclude = {
-  _count: { select: { products: true } },
+  _count: { select: { products: { where: { product: { deletedAt: null } } } } },
 } satisfies Prisma.CollectionInclude;
 
 export type CollectionListRow = Prisma.CollectionGetPayload<{ include: typeof listInclude }>;
 
 const detailInclude = {
   products: {
+    where: { product: { deletedAt: null } },
     orderBy: { position: 'asc' },
     include: {
       product: {
@@ -211,13 +212,18 @@ export async function commitAiCollection(
       input.collection.slug,
       new Set<string>(),
       async (slug) =>
+        // Match ALL rows (incl. soft-deleted): the @@unique([shopId, slug])
+        // constraint spans soft-deleted collections too.
         (await tx.collection.findFirst({
-          where: { shopId, slug, deletedAt: null },
+          where: { shopId, slug },
           select: { id: true },
         })) !== null,
     );
 
     const { status } = input.collection;
+    // Publishing the collection also activates its products, so the whole set can
+    // go live from a single confirmation; a draft keeps everything as DRAFT.
+    const productStatus = status === 'PUBLISHED' ? 'ACTIVE' : 'DRAFT';
     const collection = await tx.collection.create({
       data: {
         shopId,
@@ -240,17 +246,24 @@ export async function commitAiCollection(
         const categorySlug = slugify(item.categoryName);
         categoryId = categoryCache.get(categorySlug) ?? null;
         if (!categoryId) {
+          // Match ALL rows (the @@unique([shopId, slug]) spans soft-deleted
+          // categories); revive a soft-deleted match rather than colliding.
           const existing = await tx.category.findFirst({
-            where: { shopId, slug: categorySlug, deletedAt: null },
-            select: { id: true },
+            where: { shopId, slug: categorySlug },
+            select: { id: true, deletedAt: true },
           });
-          categoryId =
-            existing?.id ??
-            (
+          if (existing) {
+            if (existing.deletedAt) {
+              await tx.category.update({ where: { id: existing.id }, data: { deletedAt: null } });
+            }
+            categoryId = existing.id;
+          } else {
+            categoryId = (
               await tx.category.create({
                 data: { shopId, name: item.categoryName, slug: categorySlug, position: 0 },
               })
             ).id;
+          }
           categoryCache.set(categorySlug, categoryId);
         }
       }
@@ -259,8 +272,10 @@ export async function commitAiCollection(
         item.slug,
         seenProductSlugs,
         async (slug) =>
+          // Match ALL rows (incl. soft-deleted): the @@unique([shopId, slug])
+          // constraint spans soft-deleted products too.
           (await tx.product.findFirst({
-            where: { shopId, slug, deletedAt: null },
+            where: { shopId, slug },
             select: { id: true },
           })) !== null,
       );
@@ -271,7 +286,7 @@ export async function commitAiCollection(
           title: item.title,
           slug: productSlug,
           description: item.description,
-          status: 'DRAFT',
+          status: productStatus,
           basePrice: new Prisma.Decimal(item.basePrice),
           currency: input.currency,
           categoryId,

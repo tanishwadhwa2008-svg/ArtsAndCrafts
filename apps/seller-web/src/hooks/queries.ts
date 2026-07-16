@@ -10,6 +10,7 @@ import { getAnalyticsSummary } from '../api/analytics.js';
 import { getCollection, listCollections, type CollectionListParams } from '../api/collections.js';
 import { getContentPage, getHome, listContentPages } from '../api/content.js';
 import { getSettings } from '../api/settings.js';
+import { getAiStatus } from '../api/ai.js';
 
 export function useProducts(params: ProductListParams) {
   return useQuery({
@@ -56,6 +57,14 @@ export function useCollection(id: string | undefined) {
     queryKey: ['collection', id],
     queryFn: () => getCollection(id!),
     enabled: Boolean(id),
+  });
+}
+
+export function useAiStatus() {
+  return useQuery({
+    queryKey: ['ai', 'status'],
+    queryFn: getAiStatus,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

@@ -3,6 +3,7 @@ import { slugify } from '@arts/shared';
 import { env, isAiConfigured } from '../../config/env.js';
 import { AppError, BadRequestError } from '../../lib/errors.js';
 import { getObjectBytes } from '../../lib/storage.js';
+import { prisma } from '../../db/prisma.js';
 import { generateCollectionDraft, type ProviderImage } from './ai.provider.js';
 
 const MIME_BY_EXT: Record<string, string> = {
@@ -57,7 +58,18 @@ export async function draftCollectionFromImages(
     });
   }
 
-  const raw = await generateCollectionDraft(providerImages);
+  // Ground the model in the shop's existing categories so it prefers them
+  // (proposing a new one only when nothing fits).
+  const categories = await prisma.category.findMany({
+    where: { shopId, deletedAt: null },
+    select: { name: true },
+    orderBy: { name: 'asc' },
+  });
+
+  const raw = await generateCollectionDraft(
+    providerImages,
+    categories.map((category) => category.name),
+  );
 
   // Map AI products to images by index (deduping), guaranteeing exactly one
   // product per selected image, in order, with server-derived slugs.

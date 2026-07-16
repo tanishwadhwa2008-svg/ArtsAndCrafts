@@ -1,14 +1,14 @@
 import type { Request, Response } from 'express';
 import type { AiCollectionDraftRequest, AiDraftResult, ApiSuccess } from '@arts/shared';
 import { requireShopId } from '../../lib/shop-scope.js';
-import { isAiConfigured } from '../../config/env.js';
+import { env, isAiConfigured } from '../../config/env.js';
 import { draftCollectionFromImages } from './ai.service.js';
 
 /** Reports whether AI-assisted bulk upload is available (drives the UI gate). */
 export function aiStatusHandler(_req: Request, res: Response): void {
-  const body: ApiSuccess<{ available: boolean }> = {
+  const body: ApiSuccess<{ available: boolean; maxImages: number }> = {
     ok: true,
-    data: { available: isAiConfigured },
+    data: { available: isAiConfigured, maxImages: env.AI_MAX_IMAGES },
   };
   res.json(body);
 }
