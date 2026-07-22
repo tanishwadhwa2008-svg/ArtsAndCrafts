@@ -110,42 +110,6 @@ export function useDeleteProduct() {
   });
 }
 
-// --- Variants ---
-
-export function useAddVariant(productId: string) {
-  const inv = useInvalidators();
-  return useMutation({
-    mutationFn: (body: Parameters<typeof api.addVariant>[1]) => api.addVariant(productId, body),
-    onSuccess: () => {
-      inv.product(productId);
-      inv.inventory();
-    },
-  });
-}
-
-export function useUpdateVariant(productId: string) {
-  const inv = useInvalidators();
-  return useMutation({
-    mutationFn: (args: { variantId: string; body: Parameters<typeof api.updateVariant>[1] }) =>
-      api.updateVariant(args.variantId, args.body),
-    onSuccess: () => {
-      inv.product(productId);
-      inv.inventory();
-    },
-  });
-}
-
-export function useDeleteVariant(productId: string) {
-  const inv = useInvalidators();
-  return useMutation({
-    mutationFn: api.deleteVariant,
-    onSuccess: () => {
-      inv.product(productId);
-      inv.inventory();
-    },
-  });
-}
-
 // --- Images ---
 
 export function useAddImage(productId: string) {
@@ -186,8 +150,8 @@ export function useDeleteImage(productId: string) {
 export function useAdjustInventory() {
   const inv = useInvalidators();
   return useMutation({
-    mutationFn: (args: { variantId: string; body: Parameters<typeof api.adjustInventory>[1] }) =>
-      api.adjustInventory(args.variantId, args.body),
+    mutationFn: (args: { productId: string; body: Parameters<typeof api.adjustInventory>[1] }) =>
+      api.adjustInventory(args.productId, args.body),
     onSuccess: () => inv.inventory(),
   });
 }

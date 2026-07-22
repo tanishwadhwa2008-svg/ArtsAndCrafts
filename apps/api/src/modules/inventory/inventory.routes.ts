@@ -17,7 +17,7 @@ inventoryRouter.get(
   asyncHandler(controller.listInventoryHandler),
 );
 
-// `:id` is the variant id whose stock is being adjusted.
+// `:id` is the product id whose stock is being adjusted.
 inventoryRouter.patch(
   '/:id',
   validate({ params: idParamSchema, body: adjustInventorySchema }),

@@ -62,7 +62,7 @@ async function main() {
     categoryBySlug[c.slug] = created.id;
   }
 
-  // --- Products (with a default variant, inventory and an image) ---
+  // --- Products (with product-level inventory) ---
   const products = [
     {
       slug: 'hand-thrown-stoneware-mug',
@@ -100,6 +100,7 @@ async function main() {
         title: p.title,
         description: p.description,
         basePrice: p.basePrice,
+        sku: p.sku,
         status: ProductStatus.ACTIVE,
         categoryId: categoryBySlug[p.categorySlug],
       },
@@ -110,25 +111,15 @@ async function main() {
         slug: p.slug,
         description: p.description,
         basePrice: p.basePrice,
+        sku: p.sku,
         status: ProductStatus.ACTIVE,
       },
     });
 
-    const variant = await prisma.productVariant.upsert({
-      where: { sku: p.sku },
-      update: { price: p.basePrice },
-      create: {
-        productId: product.id,
-        sku: p.sku,
-        name: 'Default',
-        price: p.basePrice,
-      },
-    });
-
     await prisma.inventory.upsert({
-      where: { variantId: variant.id },
+      where: { productId: product.id },
       update: { quantity: p.quantity },
-      create: { variantId: variant.id, quantity: p.quantity },
+      create: { productId: product.id, quantity: p.quantity },
     });
   }
 

@@ -2,12 +2,10 @@ import { Router } from 'express';
 import {
   attachImageSchema,
   createProductSchema,
-  createVariantSchema,
   idParamSchema,
   productListQuerySchema,
   updateImageSchema,
   updateProductSchema,
-  updateVariantSchema,
 } from '@arts/shared';
 import { validate } from '../../../middleware/validate.js';
 import { asyncHandler } from '../../../middleware/async-handler.js';
@@ -45,23 +43,6 @@ productsRouter.delete(
   '/:id',
   validate({ params: idParamSchema }),
   asyncHandler(controller.deleteProductHandler),
-);
-
-// Variants (nested create; update/delete by variant id)
-productsRouter.post(
-  '/:id/variants',
-  validate({ params: idParamSchema, body: createVariantSchema }),
-  asyncHandler(controller.createVariantHandler),
-);
-productsRouter.patch(
-  '/variants/:id',
-  validate({ params: idParamSchema, body: updateVariantSchema }),
-  asyncHandler(controller.updateVariantHandler),
-);
-productsRouter.delete(
-  '/variants/:id',
-  validate({ params: idParamSchema }),
-  asyncHandler(controller.deleteVariantHandler),
 );
 
 // Images (nested create; update/delete by image id)

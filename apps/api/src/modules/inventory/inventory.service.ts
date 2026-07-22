@@ -4,20 +4,20 @@ import { prisma } from '../../db/prisma.js';
 import { BadRequestError, ConflictError, NotFoundError } from '../../lib/errors.js';
 import { toSkipTake } from '../../lib/pagination.js';
 
-/** Inventory row joined with its variant and parent product. */
+/** Inventory row joined with its product. */
 export const inventoryInclude = {
-  variant: { include: { product: { select: { id: true, title: true } } } },
+  product: { select: { id: true, title: true, sku: true } },
 } satisfies Prisma.InventoryInclude;
 
 export type InventoryWithContext = Prisma.InventoryGetPayload<{ include: typeof inventoryInclude }>;
 
-async function getOwnedInventory(shopId: string, variantId: string): Promise<InventoryWithContext> {
+async function getOwnedInventory(shopId: string, productId: string): Promise<InventoryWithContext> {
   const inventory = await prisma.inventory.findFirst({
-    where: { variantId, variant: { product: { shopId, deletedAt: null } } },
+    where: { productId, product: { shopId, deletedAt: null } },
     include: inventoryInclude,
   });
   if (!inventory) {
-    throw new NotFoundError('Inventory not found for this variant');
+    throw new NotFoundError('Inventory not found for this product');
   }
   return inventory;
 }
@@ -27,7 +27,7 @@ export async function listInventory(
   query: InventoryListQuery,
 ): Promise<{ items: InventoryWithContext[]; total: number }> {
   const base: Prisma.InventoryWhereInput = {
-    variant: { product: { shopId, deletedAt: null } },
+    product: { shopId, deletedAt: null },
   };
 
   let where = base;
@@ -37,8 +37,7 @@ export async function listInventory(
     const lowStock = await prisma.$queryRaw<Array<{ id: string }>>`
       SELECT i.id
       FROM inventory i
-      JOIN product_variants v ON v.id = i."variantId"
-      JOIN products p ON p.id = v."productId"
+      JOIN products p ON p.id = i."productId"
       WHERE p."shopId" = ${shopId}
         AND p."deletedAt" IS NULL
         AND i.quantity <= i."lowStockThreshold"
@@ -63,10 +62,10 @@ export async function listInventory(
 
 export async function adjustInventory(
   shopId: string,
-  variantId: string,
+  productId: string,
   input: AdjustInventoryInput,
 ): Promise<InventoryWithContext> {
-  const current = await getOwnedInventory(shopId, variantId);
+  const current = await getOwnedInventory(shopId, productId);
 
   let nextQuantity = current.quantity;
   if (input.setQuantity !== undefined) {
@@ -100,5 +99,5 @@ export async function adjustInventory(
     await prisma.inventory.update({ where: { id: current.id }, data });
   }
 
-  return getOwnedInventory(shopId, variantId);
+  return getOwnedInventory(shopId, productId);
 }

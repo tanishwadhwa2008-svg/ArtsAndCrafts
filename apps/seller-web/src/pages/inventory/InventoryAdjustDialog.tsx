@@ -42,7 +42,7 @@ export function InventoryAdjustDialog({
     if (!item) return;
     try {
       await adjustMut.mutateAsync({
-        variantId: item.variantId,
+        productId: item.productId,
         body: {
           setQuantity: quantity,
           lowStockThreshold: threshold,
@@ -63,9 +63,7 @@ export function InventoryAdjustDialog({
       <DialogContent>
         <DialogHeader
           title="Adjust stock"
-          description={
-            item ? `${item.productTitle} · ${item.variantName} (${item.sku})` : undefined
-          }
+          description={item ? `${item.productTitle}${item.sku ? ` (${item.sku})` : ''}` : undefined}
         />
         <form onSubmit={submit} className="space-y-4">
           <Field label="Quantity on hand" htmlFor="inv-qty">

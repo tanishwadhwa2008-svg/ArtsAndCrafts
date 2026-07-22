@@ -12,18 +12,14 @@ import { NotFoundError } from '../../lib/errors.js';
 
 const productCardInclude = {
   images: { orderBy: [{ isPrimary: 'desc' as const }, { position: 'asc' as const }], take: 1 },
-  variants: { where: { isActive: true }, include: { inventory: true } },
+  inventory: true,
 } satisfies Prisma.ProductInclude;
 
 export type PublicProductCardRow = Prisma.ProductGetPayload<{ include: typeof productCardInclude }>;
 
 const productDetailInclude = {
   images: { orderBy: [{ isPrimary: 'desc' as const }, { position: 'asc' as const }] },
-  variants: {
-    where: { isActive: true },
-    include: { inventory: true },
-    orderBy: { createdAt: 'asc' as const },
-  },
+  inventory: true,
   category: { select: { name: true, slug: true } },
 } satisfies Prisma.ProductInclude;
 

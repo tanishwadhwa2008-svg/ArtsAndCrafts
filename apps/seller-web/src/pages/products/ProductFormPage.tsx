@@ -19,7 +19,7 @@ import {
   Textarea,
   useToast,
 } from '@arts/ui';
-import { VariantsSection } from './VariantsSection.js';
+import { StockSection } from './StockSection.js';
 import { ImagesSection } from './ImagesSection.js';
 
 const STATUSES = ['DRAFT', 'ACTIVE', 'ARCHIVED'] as const;
@@ -223,12 +223,12 @@ export function ProductFormPage() {
 
       {isEdit && product ? (
         <div className="mt-8 space-y-8">
-          <VariantsSection productId={product.id} variants={product.variants} />
+          <StockSection productId={product.id} inventory={product.inventory} />
           <ImagesSection productId={product.id} images={product.images} />
         </div>
       ) : (
         <p className="mt-6 text-sm text-faint">
-          Save the product first to add variants, stock and images.
+          Save the product first to add stock and images.
         </p>
       )}
     </div>

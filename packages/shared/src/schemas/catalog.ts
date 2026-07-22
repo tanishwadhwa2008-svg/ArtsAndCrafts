@@ -33,6 +33,7 @@ export const createProductSchema = z.object({
   status: productStatusSchema.default('DRAFT'),
   basePrice: moneySchema,
   currency: currencySchema.default('USD'),
+  sku: z.string().trim().max(80).optional(),
   categoryId: z.string().cuid().optional(),
   metaTitle: z.string().trim().max(160).optional(),
   metaDescription: z.string().trim().max(320).optional(),
@@ -49,21 +50,6 @@ export const productListQuerySchema = paginationQuerySchema.extend({
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 export type ProductListQuery = z.infer<typeof productListQuerySchema>;
-
-// --- Variants ---
-
-export const createVariantSchema = z.object({
-  sku: z.string().trim().min(1).max(80),
-  name: z.string().trim().min(1).max(120),
-  price: moneySchema.optional(),
-  attributes: z.record(z.string(), z.string()).optional(),
-  isActive: z.boolean().default(true),
-});
-
-export const updateVariantSchema = createVariantSchema.partial();
-
-export type CreateVariantInput = z.infer<typeof createVariantSchema>;
-export type UpdateVariantInput = z.infer<typeof updateVariantSchema>;
 
 // --- Product images (attach after upload) ---
 

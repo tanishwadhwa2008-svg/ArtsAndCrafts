@@ -1,11 +1,9 @@
 import type { InventoryWithContext } from './inventory.service.js';
 
 export interface InventoryItemDto {
-  variantId: string;
-  sku: string;
-  variantName: string;
   productId: string;
   productTitle: string;
+  sku: string | null;
   quantity: number;
   reserved: number;
   available: number;
@@ -17,11 +15,9 @@ export interface InventoryItemDto {
 
 export function serializeInventoryItem(inventory: InventoryWithContext): InventoryItemDto {
   return {
-    variantId: inventory.variantId,
-    sku: inventory.variant.sku,
-    variantName: inventory.variant.name,
-    productId: inventory.variant.product.id,
-    productTitle: inventory.variant.product.title,
+    productId: inventory.productId,
+    productTitle: inventory.product.title,
+    sku: inventory.product.sku,
     quantity: inventory.quantity,
     reserved: inventory.reserved,
     available: inventory.quantity - inventory.reserved,

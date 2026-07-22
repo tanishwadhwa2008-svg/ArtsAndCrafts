@@ -22,18 +22,10 @@ export interface ProductImage {
   altText: string | null;
 }
 
-export interface ProductVariant {
-  id: string;
-  name: string;
-  price: string | null;
-  inStock: boolean;
-}
-
 export interface ProductDetail extends ProductCard {
   description: string | null;
   category: { name: string; slug: string } | null;
   images: ProductImage[];
-  variants: ProductVariant[];
 }
 
 export interface CollectionCard {

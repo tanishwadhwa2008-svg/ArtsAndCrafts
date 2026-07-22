@@ -28,7 +28,6 @@ export async function getAnalyticsSummary(shopId: string): Promise<AnalyticsSumm
     productsTotal,
     statusGroups,
     categoriesTotal,
-    variantsTotal,
     categoryGroups,
     categories,
     inventoryRows,
@@ -37,7 +36,6 @@ export async function getAnalyticsSummary(shopId: string): Promise<AnalyticsSumm
     prisma.product.count({ where: productWhere }),
     prisma.product.groupBy({ by: ['status'], where: productWhere, _count: { _all: true } }),
     prisma.category.count({ where: { shopId, deletedAt: null } }),
-    prisma.productVariant.count({ where: { product: productWhere } }),
     prisma.product.groupBy({ by: ['categoryId'], where: productWhere, _count: { _all: true } }),
     prisma.category.findMany({
       where: { shopId, deletedAt: null },
@@ -51,8 +49,7 @@ export async function getAnalyticsSummary(shopId: string): Promise<AnalyticsSumm
              COALESCE(SUM(i.quantity), 0) AS units,
              COALESCE(SUM(i.quantity * p."basePrice"), 0) AS value
       FROM inventory i
-      JOIN product_variants v ON v.id = i."variantId"
-      JOIN products p ON p.id = v."productId"
+      JOIN products p ON p.id = i."productId"
       WHERE p."shopId" = ${shopId}
         AND p."deletedAt" IS NULL
       GROUP BY p.currency
@@ -60,8 +57,7 @@ export async function getAnalyticsSummary(shopId: string): Promise<AnalyticsSumm
     prisma.$queryRaw<CountRow[]>`
       SELECT COUNT(*) AS count
       FROM inventory i
-      JOIN product_variants v ON v.id = i."variantId"
-      JOIN products p ON p.id = v."productId"
+      JOIN products p ON p.id = i."productId"
       WHERE p."shopId" = ${shopId}
         AND p."deletedAt" IS NULL
         AND i.quantity <= i."lowStockThreshold"
@@ -93,7 +89,6 @@ export async function getAnalyticsSummary(shopId: string): Promise<AnalyticsSumm
   return {
     products: { total: productsTotal, byStatus },
     categories: { total: categoriesTotal },
-    variants: { total: variantsTotal },
     inventory: {
       totalUnits,
       lowStockCount: toNumber(lowStockRows[0]?.count),

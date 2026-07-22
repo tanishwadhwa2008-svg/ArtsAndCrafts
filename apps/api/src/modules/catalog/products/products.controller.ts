@@ -3,12 +3,10 @@ import type {
   ApiSuccess,
   AttachImageInput,
   CreateProductInput,
-  CreateVariantInput,
   Paginated,
   ProductListQuery,
   UpdateImageInput,
   UpdateProductInput,
-  UpdateVariantInput,
 } from '@arts/shared';
 import { requireShopId } from '../../../lib/shop-scope.js';
 import { buildPaginationMeta } from '../../../lib/pagination.js';
@@ -16,10 +14,8 @@ import * as productsService from './products.service.js';
 import {
   serializeImage,
   serializeProduct,
-  serializeVariant,
   type ImageDto,
   type ProductDto,
-  type VariantDto,
 } from './products.serializer.js';
 
 export async function listProductsHandler(req: Request, res: Response): Promise<void> {
@@ -66,33 +62,6 @@ export async function deleteProductHandler(req: Request, res: Response): Promise
   const shopId = requireShopId(req);
   const { id } = req.validated.params as { id: string };
   await productsService.deleteProduct(shopId, id);
-  res.status(204).send();
-}
-
-// --- Variants ---
-
-export async function createVariantHandler(req: Request, res: Response): Promise<void> {
-  const shopId = requireShopId(req);
-  const { id } = req.validated.params as { id: string };
-  const input = req.validated.body as CreateVariantInput;
-  const variant = await productsService.addVariant(shopId, id, input);
-  const body: ApiSuccess<VariantDto> = { ok: true, data: serializeVariant(variant) };
-  res.status(201).json(body);
-}
-
-export async function updateVariantHandler(req: Request, res: Response): Promise<void> {
-  const shopId = requireShopId(req);
-  const { id } = req.validated.params as { id: string };
-  const input = req.validated.body as UpdateVariantInput;
-  const variant = await productsService.updateVariant(shopId, id, input);
-  const body: ApiSuccess<VariantDto> = { ok: true, data: serializeVariant(variant) };
-  res.json(body);
-}
-
-export async function deleteVariantHandler(req: Request, res: Response): Promise<void> {
-  const shopId = requireShopId(req);
-  const { id } = req.validated.params as { id: string };
-  await productsService.deleteVariant(shopId, id);
   res.status(204).send();
 }
 

@@ -1,4 +1,4 @@
-import type { Inventory, ProductImage, ProductVariant } from '@prisma/client';
+import type { Inventory, ProductImage } from '@prisma/client';
 import { serializeMoney } from '../../../lib/money.js';
 import type { ProductWithRelations } from './products.service.js';
 
@@ -8,16 +8,6 @@ export interface InventoryDto {
   available: number;
   lowStockThreshold: number;
   version: number;
-}
-
-export interface VariantDto {
-  id: string;
-  sku: string;
-  name: string;
-  price: string | null;
-  attributes: unknown;
-  isActive: boolean;
-  inventory: InventoryDto | null;
 }
 
 export interface ImageDto {
@@ -36,12 +26,13 @@ export interface ProductDto {
   status: string;
   basePrice: string;
   currency: string;
+  sku: string | null;
   categoryId: string | null;
   metaTitle: string | null;
   metaDescription: string | null;
   createdAt: string;
   updatedAt: string;
-  variants: VariantDto[];
+  inventory: InventoryDto | null;
   images: ImageDto[];
 }
 
@@ -52,20 +43,6 @@ export function serializeInventory(inventory: Inventory): InventoryDto {
     available: inventory.quantity - inventory.reserved,
     lowStockThreshold: inventory.lowStockThreshold,
     version: inventory.version,
-  };
-}
-
-export function serializeVariant(
-  variant: ProductVariant & { inventory?: Inventory | null },
-): VariantDto {
-  return {
-    id: variant.id,
-    sku: variant.sku,
-    name: variant.name,
-    price: variant.price !== null ? serializeMoney(variant.price) : null,
-    attributes: variant.attributes,
-    isActive: variant.isActive,
-    inventory: variant.inventory ? serializeInventory(variant.inventory) : null,
   };
 }
 
@@ -88,12 +65,13 @@ export function serializeProduct(product: ProductWithRelations): ProductDto {
     status: product.status,
     basePrice: serializeMoney(product.basePrice),
     currency: product.currency,
+    sku: product.sku,
     categoryId: product.categoryId,
     metaTitle: product.metaTitle,
     metaDescription: product.metaDescription,
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
-    variants: product.variants.map(serializeVariant),
+    inventory: product.inventory ? serializeInventory(product.inventory) : null,
     images: product.images.map(serializeImage),
   };
 }

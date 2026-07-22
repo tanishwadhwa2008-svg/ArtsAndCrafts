@@ -52,7 +52,7 @@ export function ProductsPage() {
   const remove = async (product: Product) => {
     const ok = await confirm({
       title: 'Delete product',
-      message: `Delete product "${product.title}"? This also removes its variants and images.`,
+      message: `Delete product "${product.title}"? This also removes its images.`,
       confirmLabel: 'Delete',
       destructive: true,
     });
@@ -112,7 +112,7 @@ export function ProductsPage() {
                 <TH>Title</TH>
                 <TH>Status</TH>
                 <TH>Base price</TH>
-                <TH>Variants</TH>
+                <TH>Stock</TH>
                 <TH>Updated</TH>
                 <TH className="text-right">Actions</TH>
               </TR>
@@ -133,7 +133,7 @@ export function ProductsPage() {
                       {p.currency} {p.basePrice}
                     </span>
                   </TD>
-                  <TD>{p.variants.length}</TD>
+                  <TD>{p.inventory?.quantity ?? 0}</TD>
                   <TD className="text-muted">{new Date(p.updatedAt).toLocaleDateString()}</TD>
                   <TD>
                     <div className="flex justify-end gap-1">

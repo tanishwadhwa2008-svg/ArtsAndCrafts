@@ -1,12 +1,10 @@
-import { Prisma, type ProductImage, type ProductVariant } from '@prisma/client';
+import { Prisma, type ProductImage } from '@prisma/client';
 import type {
   AttachImageInput,
   CreateProductInput,
-  CreateVariantInput,
   ProductListQuery,
   UpdateImageInput,
   UpdateProductInput,
-  UpdateVariantInput,
 } from '@arts/shared';
 import { prisma } from '../../../db/prisma.js';
 import { NotFoundError } from '../../../lib/errors.js';
@@ -14,7 +12,7 @@ import { toSkipTake } from '../../../lib/pagination.js';
 
 /** Relations always loaded with a product for the seller portal. */
 export const productInclude = {
-  variants: { include: { inventory: true }, orderBy: { createdAt: 'asc' } },
+  inventory: true,
   images: { orderBy: { position: 'asc' } },
 } satisfies Prisma.ProductInclude;
 
@@ -80,6 +78,7 @@ export async function createProduct(
       shopId,
       title: input.title,
       slug: input.slug,
+      sku: input.sku,
       description: input.description,
       status: input.status,
       basePrice: new Prisma.Decimal(input.basePrice),
@@ -87,6 +86,8 @@ export async function createProduct(
       categoryId: input.categoryId,
       metaTitle: input.metaTitle,
       metaDescription: input.metaDescription,
+      // Every product gets an inventory row so stock can be tracked immediately.
+      inventory: { create: {} },
     },
     include: productInclude,
   });
@@ -107,6 +108,7 @@ export async function updateProduct(
     data: {
       title: input.title,
       slug: input.slug,
+      sku: input.sku,
       description: input.description,
       status: input.status,
       basePrice: input.basePrice !== undefined ? new Prisma.Decimal(input.basePrice) : undefined,
@@ -122,67 +124,6 @@ export async function updateProduct(
 export async function deleteProduct(shopId: string, id: string): Promise<void> {
   await getProduct(shopId, id);
   await prisma.product.update({ where: { id }, data: { deletedAt: new Date() } });
-}
-
-// --- Variants ---
-
-export type VariantWithInventory = Prisma.ProductVariantGetPayload<{
-  include: { inventory: true };
-}>;
-
-async function getOwnedVariant(shopId: string, variantId: string): Promise<ProductVariant> {
-  const variant = await prisma.productVariant.findFirst({
-    where: { id: variantId, product: { shopId, deletedAt: null } },
-  });
-  if (!variant) {
-    throw new NotFoundError('Variant not found');
-  }
-  return variant;
-}
-
-export async function addVariant(
-  shopId: string,
-  productId: string,
-  input: CreateVariantInput,
-): Promise<VariantWithInventory> {
-  await getProduct(shopId, productId);
-  return prisma.productVariant.create({
-    data: {
-      productId,
-      sku: input.sku,
-      name: input.name,
-      price: input.price !== undefined ? new Prisma.Decimal(input.price) : undefined,
-      attributes: input.attributes,
-      isActive: input.isActive,
-      // Every variant gets an inventory row so stock can be tracked immediately.
-      inventory: { create: {} },
-    },
-    include: { inventory: true },
-  });
-}
-
-export async function updateVariant(
-  shopId: string,
-  variantId: string,
-  input: UpdateVariantInput,
-): Promise<VariantWithInventory> {
-  await getOwnedVariant(shopId, variantId);
-  return prisma.productVariant.update({
-    where: { id: variantId },
-    data: {
-      sku: input.sku,
-      name: input.name,
-      price: input.price !== undefined ? new Prisma.Decimal(input.price) : undefined,
-      attributes: input.attributes,
-      isActive: input.isActive,
-    },
-    include: { inventory: true },
-  });
-}
-
-export async function deleteVariant(shopId: string, variantId: string): Promise<void> {
-  await getOwnedVariant(shopId, variantId);
-  await prisma.productVariant.delete({ where: { id: variantId } });
 }
 
 // --- Images ---

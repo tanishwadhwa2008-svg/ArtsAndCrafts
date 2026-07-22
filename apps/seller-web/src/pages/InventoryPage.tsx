@@ -58,12 +58,9 @@ export function InventoryPage() {
             </THead>
             <TBody>
               {data.items.map((i) => (
-                <TR key={i.variantId}>
-                  <TD className="font-medium text-fg">
-                    {i.productTitle}
-                    <span className="ml-1 text-faint">· {i.variantName}</span>
-                  </TD>
-                  <TD className="text-muted">{i.sku}</TD>
+                <TR key={i.productId}>
+                  <TD className="font-medium text-fg">{i.productTitle}</TD>
+                  <TD className="text-muted">{i.sku ?? '—'}</TD>
                   <TD>{i.quantity}</TD>
                   <TD>{i.available}</TD>
                   <TD className="text-muted">{i.lowStockThreshold}</TD>

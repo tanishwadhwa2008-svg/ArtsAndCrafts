@@ -6,12 +6,10 @@ import type {
   PublicProductDetailRow,
 } from './public.service.js';
 
-type VariantWithInventory = { inventory: { quantity: number; reserved: number } | null };
+type WithInventory = { inventory: { quantity: number; reserved: number } | null };
 
-function anyInStock(variants: VariantWithInventory[]): boolean {
-  return variants.some(
-    (v) => v.inventory != null && v.inventory.quantity - v.inventory.reserved > 0,
-  );
+function isInStock(product: WithInventory): boolean {
+  return product.inventory != null && product.inventory.quantity - product.inventory.reserved > 0;
 }
 
 export interface PublicProductCardDto {
@@ -32,20 +30,13 @@ export function serializePublicProductCard(product: PublicProductCardRow): Publi
     price: serializeMoney(product.basePrice),
     currency: product.currency,
     imageUrl: product.images[0]?.url ?? null,
-    inStock: anyInStock(product.variants),
+    inStock: isInStock(product),
   };
 }
 
 export interface PublicProductImageDto {
   url: string;
   altText: string | null;
-}
-
-export interface PublicProductVariantDto {
-  id: string;
-  name: string;
-  price: string | null;
-  inStock: boolean;
 }
 
 export interface PublicProductDetailDto {
@@ -58,7 +49,6 @@ export interface PublicProductDetailDto {
   inStock: boolean;
   category: { name: string; slug: string } | null;
   images: PublicProductImageDto[];
-  variants: PublicProductVariantDto[];
 }
 
 export function serializePublicProductDetail(
@@ -71,17 +61,11 @@ export function serializePublicProductDetail(
     description: product.description,
     price: serializeMoney(product.basePrice),
     currency: product.currency,
-    inStock: anyInStock(product.variants),
+    inStock: isInStock(product),
     category: product.category
       ? { name: product.category.name, slug: product.category.slug }
       : null,
     images: product.images.map((img) => ({ url: img.url, altText: img.altText })),
-    variants: product.variants.map((v) => ({
-      id: v.id,
-      name: v.name,
-      price: v.price != null ? serializeMoney(v.price) : null,
-      inStock: v.inventory != null && v.inventory.quantity - v.inventory.reserved > 0,
-    })),
   };
 }
 

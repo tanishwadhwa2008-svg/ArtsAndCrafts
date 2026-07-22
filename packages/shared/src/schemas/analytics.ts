@@ -34,13 +34,10 @@ export interface AnalyticsSummary {
   categories: {
     total: number;
   };
-  variants: {
-    total: number;
-  };
   inventory: {
-    /** Total units on hand across all variants. */
+    /** Total units on hand across all products. */
     totalUnits: number;
-    /** Number of variants at or below their low-stock threshold. */
+    /** Number of products at or below their low-stock threshold. */
     lowStockCount: number;
     /** On-hand inventory value, grouped by product currency. */
     valueByCurrency: CurrencyValue[];

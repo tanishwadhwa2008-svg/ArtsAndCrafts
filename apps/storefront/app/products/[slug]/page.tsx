@@ -62,23 +62,6 @@ export default async function ProductPage({ params }: Params) {
             </p>
           ) : null}
 
-          {product.variants.length > 0 ? (
-            <div className="mt-8 border-t border-line pt-6">
-              <p className="eyebrow text-xs">Options</p>
-              <ul className="mt-3 space-y-2 text-sm">
-                {product.variants.map((v) => (
-                  <li key={v.id} className="flex items-center justify-between gap-4">
-                    <span className="text-fg">{v.name}</span>
-                    <span className="text-muted">
-                      {formatPrice(v.price ?? product.price, product.currency)}
-                      {v.inStock ? '' : ' · made to order'}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
           <div className="mt-10">
             <Button asChild variant="luxury" size="lg">
               <Link href={`/contact?ref=${product.slug}`}>Enquire about this piece</Link>

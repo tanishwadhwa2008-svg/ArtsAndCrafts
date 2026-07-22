@@ -3,12 +3,10 @@ import type {
   AttachImageInput,
   CreateCategoryInput,
   CreateProductInput,
-  CreateVariantInput,
   Paginated,
   UpdateCategoryInput,
   UpdateImageInput,
   UpdateProductInput,
-  UpdateVariantInput,
   UploadUrlInput,
 } from '@arts/shared';
 import { apiRequest } from '../lib/api.js';
@@ -32,16 +30,6 @@ export interface InventoryInfo {
   version: number;
 }
 
-export interface Variant {
-  id: string;
-  sku: string;
-  name: string;
-  price: string | null;
-  attributes: unknown;
-  isActive: boolean;
-  inventory: InventoryInfo | null;
-}
-
 export interface ProductImage {
   id: string;
   url: string;
@@ -58,21 +46,20 @@ export interface Product {
   status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
   basePrice: string;
   currency: string;
+  sku: string | null;
   categoryId: string | null;
   metaTitle: string | null;
   metaDescription: string | null;
   createdAt: string;
   updatedAt: string;
-  variants: Variant[];
+  inventory: InventoryInfo | null;
   images: ProductImage[];
 }
 
 export interface InventoryItem {
-  variantId: string;
-  sku: string;
-  variantName: string;
   productId: string;
   productTitle: string;
+  sku: string | null;
   quantity: number;
   reserved: number;
   available: number;
@@ -141,20 +128,6 @@ export function deleteProduct(id: string): Promise<void> {
   return apiRequest<void>(`/products/${id}`, { method: 'DELETE' });
 }
 
-// --- Variants ---
-
-export function addVariant(productId: string, body: CreateVariantInput): Promise<Variant> {
-  return apiRequest<Variant>(`/products/${productId}/variants`, { method: 'POST', body });
-}
-
-export function updateVariant(variantId: string, body: UpdateVariantInput): Promise<Variant> {
-  return apiRequest<Variant>(`/products/variants/${variantId}`, { method: 'PATCH', body });
-}
-
-export function deleteVariant(variantId: string): Promise<void> {
-  return apiRequest<void>(`/products/variants/${variantId}`, { method: 'DELETE' });
-}
-
 // --- Images ---
 
 export function addImage(productId: string, body: AttachImageInput): Promise<ProductImage> {
@@ -193,10 +166,10 @@ export function deleteCategory(id: string): Promise<void> {
 // --- Inventory ---
 
 export function adjustInventory(
-  variantId: string,
+  productId: string,
   body: AdjustInventoryInput,
 ): Promise<InventoryItem> {
-  return apiRequest<InventoryItem>(`/inventory/${variantId}`, { method: 'PATCH', body });
+  return apiRequest<InventoryItem>(`/inventory/${productId}`, { method: 'PATCH', body });
 }
 
 // --- Media ---

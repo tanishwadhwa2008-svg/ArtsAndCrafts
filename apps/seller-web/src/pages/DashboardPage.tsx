@@ -1,4 +1,4 @@
-import { AlertTriangle, Boxes, FolderTree, Layers, Package, Wallet } from 'lucide-react';
+import { AlertTriangle, FolderTree, Layers, Package, Wallet } from 'lucide-react';
 import { BarChart, Card, CardContent, CardHeader, CardTitle, PageHeader, Spinner } from '@arts/ui';
 import { useAnalyticsSummary } from '../hooks/queries.js';
 
@@ -83,12 +83,6 @@ export function DashboardPage() {
               label="Categories"
               value={data?.categories.total ?? 0}
               icon={FolderTree}
-              loading={isLoading}
-            />
-            <StatCard
-              label="Tracked Variants"
-              value={data?.variants.total ?? 0}
-              icon={Boxes}
               loading={isLoading}
             />
             <StatCard
