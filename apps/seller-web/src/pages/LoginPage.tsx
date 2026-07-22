@@ -37,7 +37,7 @@ export function LoginPage() {
           <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-b from-gold-400 to-gold-600 text-[#1a1206] shadow-lg shadow-gold-700/20">
             <Gem className="h-7 w-7" />
           </span>
-          <p className="eyebrow">Artisan Collective</p>
+          <p className="eyebrow">A&C India</p>
           <h1 className="mt-1 text-3xl text-gold-400">Seller Portal</h1>
           <p className="mt-2 font-serif text-sm italic text-muted">
             Curate your timeless collection.

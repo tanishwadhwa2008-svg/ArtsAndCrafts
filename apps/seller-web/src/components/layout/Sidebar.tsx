@@ -33,7 +33,7 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
           <Gem className="h-5 w-5" />
         </span>
         <div className="leading-tight">
-          <p className="font-display text-sm font-semibold tracking-wide text-gold-300">Artisan</p>
+          <p className="font-display text-sm font-semibold tracking-wide text-gold-300">A&C India</p>
           <p className="text-[11px] uppercase tracking-[0.18em] text-faint">Seller Portal</p>
         </div>
       </div>
