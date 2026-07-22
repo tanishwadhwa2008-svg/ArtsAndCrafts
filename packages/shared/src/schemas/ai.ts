@@ -80,6 +80,8 @@ export const aiCommitProductSchema = z.object({
   metaDescription: z.string().trim().max(320).optional(),
   storageKey: z.string().trim().min(1).max(500),
   url: z.string().url(),
+  width: z.number().int().positive().max(20000).optional(),
+  height: z.number().int().positive().max(20000).optional(),
 });
 export type AiCommitProduct = z.infer<typeof aiCommitProductSchema>;
 

@@ -23,6 +23,9 @@ export interface CompressionResult {
   file: File;
   /** True when the returned file was re-encoded and is smaller than the source. */
   wasCompressed: boolean;
+  /** Intrinsic pixel dimensions of the returned file, when it could be decoded. */
+  width?: number;
+  height?: number;
 }
 
 function withWebpExtension(name: string): string {
@@ -30,13 +33,32 @@ function withWebpExtension(name: string): string {
 }
 
 /**
+ * Reads an image file's intrinsic pixel dimensions in the browser, or
+ * `undefined` when it cannot be decoded. Lets callers record native dimensions
+ * so images can later be rendered at their true aspect ratio without layout shift.
+ */
+export async function getImageDimensions(
+  file: File,
+): Promise<{ width: number; height: number } | undefined> {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const dimensions = { width: bitmap.width, height: bitmap.height };
+    bitmap.close();
+    return dimensions;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Optimizes an image file in the browser. Returns the original file unchanged
  * when it is not a compressible raster type, when the browser cannot decode it,
- * or when compression would not reduce the size.
+ * or when compression would not reduce the size. The returned `width`/`height`
+ * always describe the file that is handed back (optimized or original).
  */
 export async function compressImage(file: File): Promise<CompressionResult> {
-  // Preserve animated GIFs and ignore anything that is not a raster image.
-  if (file.type === 'image/gif' || !file.type.startsWith('image/')) {
+  // Ignore anything that is not a raster image.
+  if (!file.type.startsWith('image/')) {
     return { file, wasCompressed: false };
   }
 
@@ -49,6 +71,13 @@ export async function compressImage(file: File): Promise<CompressionResult> {
 
   try {
     const { width, height } = bitmap;
+
+    // Preserve animated GIFs untouched (a canvas re-encode flattens them), but
+    // still report their dimensions.
+    if (file.type === 'image/gif') {
+      return { file, wasCompressed: false, width, height };
+    }
+
     const scale = Math.min(1, MAX_DIMENSION / Math.max(width, height));
     const targetWidth = Math.max(1, Math.round(width * scale));
     const targetHeight = Math.max(1, Math.round(height * scale));
@@ -59,7 +88,7 @@ export async function compressImage(file: File): Promise<CompressionResult> {
 
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-      return { file, wasCompressed: false };
+      return { file, wasCompressed: false, width, height };
     }
     ctx.drawImage(bitmap, 0, 0, targetWidth, targetHeight);
 
@@ -69,14 +98,14 @@ export async function compressImage(file: File): Promise<CompressionResult> {
 
     // Keep the original if encoding failed or did not actually save bytes.
     if (!blob || blob.size >= file.size) {
-      return { file, wasCompressed: false };
+      return { file, wasCompressed: false, width, height };
     }
 
     const optimized = new File([blob], withWebpExtension(file.name), {
       type: 'image/webp',
       lastModified: Date.now(),
     });
-    return { file: optimized, wasCompressed: true };
+    return { file: optimized, wasCompressed: true, width: targetWidth, height: targetHeight };
   } finally {
     bitmap.close();
   }

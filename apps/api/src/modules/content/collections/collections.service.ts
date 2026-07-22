@@ -301,6 +301,8 @@ export async function commitAiCollection(
           storageKey: item.storageKey,
           url: item.url,
           altText: item.altText,
+          width: item.width,
+          height: item.height,
           position: 0,
           isPrimary: true,
         },

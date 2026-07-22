@@ -57,6 +57,8 @@ export const attachImageSchema = z.object({
   storageKey: z.string().trim().min(1).max(500),
   url: z.string().url(),
   altText: z.string().trim().max(300).optional(),
+  width: z.number().int().positive().max(20000).optional(),
+  height: z.number().int().positive().max(20000).optional(),
   position: z.number().int().min(0).default(0),
   isPrimary: z.boolean().default(false),
 });

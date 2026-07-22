@@ -18,10 +18,11 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  Spinner,
 } from '@arts/ui';
 import { ApiError } from '../../lib/api.js';
 import { cn } from '../../lib/cn.js';
-import { ImageCropDialog } from './ImageCropDialog.js';
+import { compressImage } from '../../lib/image-compression.js';
 
 export function ImagesSection({
   productId,
@@ -31,7 +32,7 @@ export function ImagesSection({
   images: ProductImage[];
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [cropFiles, setCropFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const addMut = useAddImage(productId);
@@ -81,7 +82,11 @@ export function ImagesSection({
     });
   };
 
-  const openCropper = (fileList: FileList) => {
+  // Uploads the selected images as-is (no cropping): each is optimized to WebP
+  // and downscaled in the browser, its native dimensions recorded, then uploaded
+  // independently so one failure never re-uploads the ones that already
+  // succeeded. Images keep their original aspect ratio wherever they display.
+  const handleFiles = async (fileList: FileList) => {
     setError(null);
     const all = Array.from(fileList);
     const valid = all.filter((f) =>
@@ -94,17 +99,13 @@ export function ImagesSection({
     if (valid.length < all.length) {
       setError(`${all.length - valid.length} file(s) skipped — unsupported type.`);
     }
-    setCropFiles(valid);
-  };
 
-  // Uploads the cropped batch the editor produced, in order. Each image uploads
-  // independently so one failure never re-uploads (and duplicates) the ones that
-  // already succeeded; the outcome is summarised via toasts and the dialog closes.
-  const uploadBatch = async (cropped: File[]) => {
+    setUploading(true);
     let uploaded = 0;
     let failed = 0;
-    for (const file of cropped) {
+    for (const original of valid) {
       try {
+        const { file, width, height } = await compressImage(original);
         if (file.size > MAX_UPLOAD_BYTES) {
           throw new Error('too large');
         }
@@ -117,6 +118,8 @@ export function ImagesSection({
         await addMut.mutateAsync({
           storageKey: target.storageKey,
           url: target.publicUrl,
+          width,
+          height,
           position: images.length + uploaded,
           isPrimary: images.length === 0 && uploaded === 0,
         });
@@ -131,7 +134,7 @@ export function ImagesSection({
     if (failed > 0) {
       toast.error(`${failed} image${failed === 1 ? '' : 's'} failed to upload.`);
     }
-    setCropFiles([]);
+    setUploading(false);
   };
 
   return (
@@ -147,25 +150,27 @@ export function ImagesSection({
           multiple
           className="hidden"
           onChange={(e) => {
-            if (e.target.files && e.target.files.length > 0) openCropper(e.target.files);
+            if (e.target.files && e.target.files.length > 0) void handleFiles(e.target.files);
             e.target.value = '';
           }}
         />
 
         {images.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          <div className="columns-2 gap-4 sm:columns-3 md:columns-4">
             {sorted.map((img, index) => (
               <div
                 key={img.id}
                 className={cn(
-                  'group relative overflow-hidden rounded-lg border bg-surface-2',
+                  'group relative mb-4 break-inside-avoid overflow-hidden rounded-lg border bg-surface-2',
                   img.isPrimary ? 'border-gold-500' : 'border-line',
                 )}
               >
                 <img
                   src={img.url}
                   alt={img.altText ?? 'Product image'}
-                  className="aspect-[4/5] w-full object-cover"
+                  width={img.width ?? undefined}
+                  height={img.height ?? undefined}
+                  className="block h-auto w-full"
                 />
                 {img.isPrimary ? (
                   <Badge variant="gold" className="absolute left-2 top-2">
@@ -228,18 +233,11 @@ export function ImagesSection({
         {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
 
         <div className="mt-5">
-          <Button variant="outline" onClick={() => fileRef.current?.click()}>
-            <ImagePlus className="h-4 w-4" />
-            Upload images
+          <Button variant="outline" disabled={uploading} onClick={() => fileRef.current?.click()}>
+            {uploading ? <Spinner /> : <ImagePlus className="h-4 w-4" />}
+            {uploading ? 'Uploading…' : 'Upload images'}
           </Button>
         </div>
-
-        <ImageCropDialog
-          open={cropFiles.length > 0}
-          files={cropFiles}
-          onCancel={() => setCropFiles([])}
-          onComplete={uploadBatch}
-        />
       </CardContent>
     </Card>
   );

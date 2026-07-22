@@ -37,6 +37,8 @@ export function serializePublicProductCard(product: PublicProductCardRow): Publi
 export interface PublicProductImageDto {
   url: string;
   altText: string | null;
+  width: number | null;
+  height: number | null;
 }
 
 export interface PublicProductDetailDto {
@@ -65,7 +67,12 @@ export function serializePublicProductDetail(
     category: product.category
       ? { name: product.category.name, slug: product.category.slug }
       : null,
-    images: product.images.map((img) => ({ url: img.url, altText: img.altText })),
+    images: product.images.map((img) => ({
+      url: img.url,
+      altText: img.altText,
+      width: img.width,
+      height: img.height,
+    })),
   };
 }
 

@@ -14,6 +14,8 @@ export interface ImageDto {
   id: string;
   url: string;
   altText: string | null;
+  width: number | null;
+  height: number | null;
   position: number;
   isPrimary: boolean;
 }
@@ -51,6 +53,8 @@ export function serializeImage(image: ProductImage): ImageDto {
     id: image.id,
     url: image.url,
     altText: image.altText,
+    width: image.width,
+    height: image.height,
     position: image.position,
     isPrimary: image.isPrimary,
   };

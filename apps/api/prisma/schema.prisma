@@ -253,6 +253,10 @@ model ProductImage {
   storageKey String
   url        String
   altText    String?
+  // Intrinsic pixel dimensions captured at upload so the storefront/editor can
+  // render images at their native aspect ratio (nullable for legacy rows).
+  width      Int?
+  height     Int?
   position   Int      @default(0)
   isPrimary  Boolean  @default(false)
   createdAt  DateTime @default(now())

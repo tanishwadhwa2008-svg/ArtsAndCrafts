@@ -55,17 +55,32 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
         type="button"
         onClick={() => setLightboxOpen(true)}
         aria-label="View full image"
-        className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden border border-line bg-gradient-to-b from-surface to-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50"
+        className="group relative block w-full cursor-zoom-in overflow-hidden border border-line bg-gradient-to-b from-surface to-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50"
       >
-        <Image
-          key={current.url}
-          src={current.url}
-          alt={current.altText ?? title}
-          fill
-          sizes="(max-width: 1024px) 100vw, 50vw"
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-          priority
-        />
+        {current.width && current.height ? (
+          <Image
+            key={current.url}
+            src={current.url}
+            alt={current.altText ?? title}
+            width={current.width}
+            height={current.height}
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+            priority
+          />
+        ) : (
+          <div className="relative aspect-[4/5] w-full">
+            <Image
+              key={current.url}
+              src={current.url}
+              alt={current.altText ?? title}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              priority
+            />
+          </div>
+        )}
         <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 border border-gold-500/40 bg-bg/70 px-2.5 py-1 text-[0.7rem] uppercase tracking-[0.14em] text-gold-200 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
           <ZoomIn className="h-3.5 w-3.5" aria-hidden="true" />
           Zoom

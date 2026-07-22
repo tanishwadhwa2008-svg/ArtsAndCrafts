@@ -34,6 +34,8 @@ export interface ProductImage {
   id: string;
   url: string;
   altText: string | null;
+  width: number | null;
+  height: number | null;
   position: number;
   isPrimary: boolean;
 }

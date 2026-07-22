@@ -155,6 +155,8 @@ export async function addImage(
         storageKey: input.storageKey,
         url: input.url,
         altText: input.altText,
+        width: input.width,
+        height: input.height,
         position: input.position,
         isPrimary: input.isPrimary,
       },

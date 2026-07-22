@@ -23,6 +23,7 @@ import {
   useToast,
 } from '@arts/ui';
 import { requestUploadUrl, uploadToStorage } from '../../api/catalog.js';
+import { getImageDimensions } from '../../lib/image-compression.js';
 import { useAiStatus, useCategories } from '../../hooks/queries.js';
 import { useAiCommit, useAiDraft } from '../../hooks/mutations.js';
 import { ApiError } from '../../lib/api.js';
@@ -47,6 +48,8 @@ interface ReviewProduct {
   metaDescription: string;
   storageKey: string;
   url: string;
+  width?: number;
+  height?: number;
   previewUrl: string;
 }
 
@@ -128,8 +131,16 @@ export function AiBulkUploadPage() {
     setError(null);
     setBusy('Uploading images…');
     try {
-      const uploaded: { storageKey: string; url: string; price: string; previewUrl: string }[] = [];
+      const uploaded: {
+        storageKey: string;
+        url: string;
+        price: string;
+        previewUrl: string;
+        width?: number;
+        height?: number;
+      }[] = [];
       for (const item of items) {
+        const dimensions = await getImageDimensions(item.file);
         const target = await requestUploadUrl({
           fileName: item.file.name,
           contentType: item.file.type as UploadUrlInput['contentType'],
@@ -141,6 +152,8 @@ export function AiBulkUploadPage() {
           url: target.publicUrl,
           price: item.price.trim(),
           previewUrl: item.previewUrl,
+          width: dimensions?.width,
+          height: dimensions?.height,
         });
       }
 
@@ -169,6 +182,8 @@ export function AiBulkUploadPage() {
             metaDescription: p.metaDescription ?? '',
             storageKey: p.storageKey,
             url: p.url,
+            width: source?.width,
+            height: source?.height,
             previewUrl: source?.previewUrl ?? p.url,
           };
         }),
@@ -204,6 +219,8 @@ export function AiBulkUploadPage() {
         metaDescription: p.metaDescription || undefined,
         storageKey: p.storageKey,
         url: p.url,
+        width: p.width,
+        height: p.height,
       })),
     };
     try {
@@ -293,14 +310,14 @@ export function AiBulkUploadPage() {
             {error ? <p className="mb-4 text-sm text-danger">{error}</p> : null}
 
             {items.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="columns-2 gap-4 sm:columns-3 lg:columns-4">
                 {items.map((item, index) => (
-                  <div key={item.id} className="overflow-hidden rounded-lg border border-line bg-surface-2">
-                    <div className="relative aspect-[4/5]">
+                  <div key={item.id} className="mb-4 break-inside-avoid overflow-hidden rounded-lg border border-line bg-surface-2">
+                    <div className="relative">
                       <img
                         src={item.previewUrl}
                         alt={`Selected ${index + 1}`}
-                        className="h-full w-full object-cover"
+                        className="block h-auto w-full"
                       />
                       <button
                         type="button"
